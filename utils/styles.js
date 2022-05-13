@@ -103,5 +103,9 @@ const useStyles = makeStyles((theme) => ({
       width: 250,
     },
   },
+
+  spands: {
+    marginLeft: '10px',
+  },
 }));
 export default useStyles;

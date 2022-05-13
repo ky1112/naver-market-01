@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+require('./User');
 
 const orderSchema = new mongoose.Schema(
   {

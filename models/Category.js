@@ -6,7 +6,7 @@ const categorySchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true },
     tags: [
       {
-        tagName: { type: String, required: true },
+        tagName: { type: String, required: false },
       },
     ],
     // user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

@@ -51,6 +51,7 @@ export default function ProductScreen(props) {
         }
       );
       setLoading(false);
+      setComment('');
       enqueueSnackbar('Review submitted successfully', { variant: 'success' });
       fetchReviews();
     } catch (err) {

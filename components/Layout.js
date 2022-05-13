@@ -91,7 +91,8 @@ export default function Layout({ title, description, children }) {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get(`/api/products/categories`);
+      //const { data } = await axios.get(`/api/products/categories`);
+      const { data } = await axios.get(`/api/categories/categories`);
       setCategories(data);
     } catch (err) {
       enqueueSnackbar(getError(err), { variant: 'error' });
@@ -399,7 +400,7 @@ export default function Layout({ title, description, children }) {
         </AppBar>
         <Container className={classes.main}>{children}</Container>
         <footer className={classes.footer}>
-          <Typography>All rights reserved. Next Amazona.</Typography>
+          <Typography>All rights reserved. 네이버 중고장터.</Typography>
         </footer>
       </ThemeProvider>
     </div>

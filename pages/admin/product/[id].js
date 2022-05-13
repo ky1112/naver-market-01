@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import React, { useEffect, useContext, useReducer, useState } from 'react';
+
 import {
   Grid,
   List,
@@ -15,7 +16,9 @@ import {
   CircularProgress,
   FormControlLabel,
   Checkbox,
+  MenuItem,
 } from '@material-ui/core';
+
 import { getError } from '../../../utils/error';
 import { Store } from '../../../utils/Store';
 import Layout from '../../../components/Layout';
@@ -28,7 +31,12 @@ function reducer(state, action) {
     case 'FETCH_REQUEST':
       return { ...state, loading: true, error: '' };
     case 'FETCH_SUCCESS':
-      return { ...state, loading: false, error: '' };
+      return {
+        ...state,
+        loading: false,
+        error: '',
+        categories: action.payload,
+      };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
     case 'UPDATE_REQUEST':
@@ -56,50 +64,66 @@ function reducer(state, action) {
 function ProductEdit({ params }) {
   const productId = params.id;
   const { state } = useContext(Store);
-  const [{ loading, error, loadingUpdate, loadingUpload }, dispatch] =
-    useReducer(reducer, {
-      loading: true,
-      error: '',
-    });
+  const [
+    { loading, error, loadingUpdate, loadingUpload, categories },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    error: '',
+    categories: [],
+  });
+
   const {
     handleSubmit,
     control,
     formState: { errors },
     setValue,
   } = useForm();
+
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
 
+  const fetchData = async () => {
+    try {
+      dispatch({ type: 'FETCH_REQUEST' });
+      const { data } = await axios.get(`/api/admin/products/${productId}`, {
+        headers: { authorization: `Bearer ${userInfo.token}` },
+      });
+
+      const res = await axios.get(`/api/admin/categories/`, {
+        headers: { authorization: `Bearer ${userInfo.token}` },
+      });
+
+      dispatch({ type: 'FETCH_SUCCESS', payload: res.data });
+
+      //categories.current = res.data;
+      //console.log(categories);
+
+      setValue('name', data.name);
+      setValue('slug', data.slug);
+      setValue('price', data.price);
+      setValue('image', data.image);
+      setValue('featuredImage', data.featuredImage);
+      setIsFeatured(data.isFeatured);
+      setValue('category', data.category);
+      setValue('brand', data.brand);
+      setValue('countInStock', data.countInStock);
+      setValue('description', data.description);
+    } catch (err) {
+      dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+    }
+  };
+
   useEffect(() => {
     if (!userInfo) {
       return router.push('/login');
     } else {
-      const fetchData = async () => {
-        try {
-          dispatch({ type: 'FETCH_REQUEST' });
-          const { data } = await axios.get(`/api/admin/products/${productId}`, {
-            headers: { authorization: `Bearer ${userInfo.token}` },
-          });
-          dispatch({ type: 'FETCH_SUCCESS' });
-          setValue('name', data.name);
-          setValue('slug', data.slug);
-          setValue('price', data.price);
-          setValue('image', data.image);
-          setValue('featuredImage', data.featuredImage);
-          setIsFeatured(data.isFeatured);
-          setValue('category', data.category);
-          setValue('brand', data.brand);
-          setValue('countInStock', data.countInStock);
-          setValue('description', data.description);
-        } catch (err) {
-          dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
-        }
-      };
       fetchData();
     }
   }, []);
+
   const uploadHandler = async (e, imageField = 'image') => {
     const file = e.target.files[0];
     const bodyFormData = new FormData();
@@ -170,22 +194,27 @@ function ProductEdit({ params }) {
             <List>
               <NextLink href="/admin/dashboard" passHref>
                 <ListItem button component="a">
-                  <ListItemText primary="Admin Dashboard"></ListItemText>
+                  <ListItemText primary="대시보드"></ListItemText>
+                </ListItem>
+              </NextLink>
+              <NextLink href="/admin/category" passHref>
+                <ListItem button component="a">
+                  <ListItemText primary="카테고리"></ListItemText>
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/orders" passHref>
                 <ListItem button component="a">
-                  <ListItemText primary="Orders"></ListItemText>
+                  <ListItemText primary="주문리스트"></ListItemText>
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/products" passHref>
                 <ListItem selected button component="a">
-                  <ListItemText primary="Products"></ListItemText>
+                  <ListItemText primary="상품"></ListItemText>
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/users" passHref>
                 <ListItem button component="a">
-                  <ListItemText primary="Users"></ListItemText>
+                  <ListItemText primary="회원관리"></ListItemText>
                 </ListItem>
               </NextLink>
             </List>
@@ -295,13 +324,15 @@ function ProductEdit({ params }) {
                         )}
                       ></Controller>
                     </ListItem>
+
                     <ListItem>
                       <Button variant="contained" component="label">
-                        Upload File
+                        이미지파일 업로드
                         <input type="file" onChange={uploadHandler} hidden />
                       </Button>
                       {loadingUpload && <CircularProgress />}
                     </ListItem>
+
                     <ListItem>
                       <FormControlLabel
                         label="Is Featured"
@@ -337,6 +368,7 @@ function ProductEdit({ params }) {
                         )}
                       ></Controller>
                     </ListItem>
+
                     <ListItem>
                       <Button variant="contained" component="label">
                         Upload File
@@ -348,7 +380,8 @@ function ProductEdit({ params }) {
                       </Button>
                       {loadingUpload && <CircularProgress />}
                     </ListItem>
-                    <ListItem>
+
+                    {/* <ListItem>
                       <Controller
                         name="category"
                         control={control}
@@ -370,7 +403,38 @@ function ProductEdit({ params }) {
                           ></TextField>
                         )}
                       ></Controller>
+                    </ListItem> */}
+
+                    <ListItem>
+                      <Controller
+                        name="category"
+                        control={control}
+                        defaultValue=""
+                        rules={{
+                          required: true,
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            id="category"
+                            variant="outlined"
+                            fullWidth
+                            select
+                            label="Categories"
+                            helperText={
+                              errors.category ? 'Category is required' : ''
+                            }
+                            {...field}
+                          >
+                            {categories.map((option) => (
+                              <MenuItem key={option._id} value={option.name}>
+                                {option.name}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        )}
+                      ></Controller>
                     </ListItem>
+
                     <ListItem>
                       <Controller
                         name="brand"
@@ -451,7 +515,7 @@ function ProductEdit({ params }) {
                         fullWidth
                         color="primary"
                       >
-                        Update
+                        업데이트
                       </Button>
                       {loadingUpdate && <CircularProgress />}
                     </ListItem>

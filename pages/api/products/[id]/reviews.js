@@ -22,8 +22,10 @@ handler.get(async (req, res) => {
 });
 
 handler.use(isAuth).post(async (req, res) => {
+  console.log(req);
   await db.connect();
   const product = await Product.findById(req.query.id);
+
   if (product) {
     const existReview = product.reviews.find((x) => x.user == req.user._id);
     if (existReview) {

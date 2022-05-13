@@ -61,6 +61,7 @@ function AdminOrders() {
         });
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
+        console.log(err);
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };

@@ -30,7 +30,12 @@ function reducer(state, action) {
     case 'FETCH_REQUEST':
       return { ...state, loading: true, error: '' };
     case 'FETCH_SUCCESS':
-      return { ...state, loading: false, products: action.payload, error: '' };
+      return {
+        ...state,
+        loading: false,
+        categories: action.payload,
+        error: '',
+      };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
     case 'CREATE_REQUEST':
@@ -52,18 +57,18 @@ function reducer(state, action) {
   }
 }
 
-function AdminProdcuts() {
+function AdminCategories() {
   const { state } = useContext(Store);
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
 
   const [
-    { loading, error, products, loadingCreate, successDelete, loadingDelete },
+    { loading, error, categories, loadingCreate, successDelete, loadingDelete },
     dispatch,
   ] = useReducer(reducer, {
     loading: true,
-    products: [],
+    categories: [],
     error: '',
   });
 
@@ -74,7 +79,7 @@ function AdminProdcuts() {
     const fetchData = async () => {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
-        const { data } = await axios.get(`/api/admin/products`, {
+        const { data } = await axios.get(`/api/admin/categories`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
@@ -97,27 +102,28 @@ function AdminProdcuts() {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
       const { data } = await axios.post(
-        `/api/admin/products`,
+        `/api/admin/categories`,
         {},
         {
           headers: { authorization: `Bearer ${userInfo.token}` },
         }
       );
       dispatch({ type: 'CREATE_SUCCESS' });
-      enqueueSnackbar('Product created successfully', { variant: 'success' });
-      router.push(`/admin/product/${data.product._id}`);
+      enqueueSnackbar('Category created successfully', { variant: 'success' });
+      router.push(`/admin/category/${data.category._id}`);
     } catch (err) {
       dispatch({ type: 'CREATE_FAIL' });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
-  const deleteHandler = async (productId) => {
+
+  const deleteHandler = async (categoryId) => {
     if (!window.confirm('Are you sure?')) {
       return;
     }
     try {
       dispatch({ type: 'DELETE_REQUEST' });
-      await axios.delete(`/api/admin/products/${productId}`, {
+      await axios.delete(`/api/admin/categories/${categoryId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
       dispatch({ type: 'DELETE_SUCCESS' });
@@ -195,28 +201,35 @@ function AdminProdcuts() {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>아이디</TableCell>
+                          <TableCell>No</TableCell>
+                          <TableCell>KEY</TableCell>
                           <TableCell>카테고리명</TableCell>
                           <TableCell>슬러그</TableCell>
-                          <TableCell>태그</TableCell>
+                          <TableCell>태그(서브카테고리)</TableCell>
                           <TableCell>유저</TableCell>
                           <TableCell>ACTIONS</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {products.map((product) => (
-                          <TableRow key={product._id}>
+                        {categories.map((category, index) => (
+                          <TableRow key={category._id}>
+                            <TableCell>{index + 1}</TableCell>
                             <TableCell>
-                              {product._id.substring(20, 24)}
+                              {category._id.substring(20, 24)}
                             </TableCell>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>${product.price}</TableCell>
-                            <TableCell>{product.category}</TableCell>
-                            <TableCell>{product.countInStock}</TableCell>
-                            <TableCell>{product.rating}</TableCell>
+                            <TableCell>{category.name}</TableCell>
+                            <TableCell>{category.slug}</TableCell>
+                            <TableCell>
+                              {category.tags.map((tag) => (
+                                <span key={tag._id} className={classes.spands}>
+                                  {tag.tagName}
+                                </span>
+                              ))}
+                            </TableCell>
+                            <TableCell>{category.user}</TableCell>
                             <TableCell>
                               <NextLink
-                                href={`/admin/product/${product._id}`}
+                                href={`/admin/category/${category._id}`}
                                 passHref
                               >
                                 <Button size="small" variant="contained">
@@ -224,7 +237,7 @@ function AdminProdcuts() {
                                 </Button>
                               </NextLink>{' '}
                               <Button
-                                onClick={() => deleteHandler(product._id)}
+                                onClick={() => deleteHandler(category._id)}
                                 size="small"
                                 variant="contained"
                               >
@@ -246,4 +259,4 @@ function AdminProdcuts() {
   );
 }
 
-export default dynamic(() => Promise.resolve(AdminProdcuts), { ssr: false });
+export default dynamic(() => Promise.resolve(AdminCategories), { ssr: false });
