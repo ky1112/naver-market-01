@@ -1,7 +1,6 @@
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
 import React, { useEffect, useContext, useReducer, useState } from 'react';
 import {
   Grid,
@@ -10,7 +9,6 @@ import {
   Typography,
   Card,
   Button,
-  ListItemText,
   TextField,
   CircularProgress,
   Checkbox,
@@ -19,6 +17,7 @@ import {
 import { getError } from '../../../utils/error';
 import { Store } from '../../../utils/Store';
 import Layout from '../../../components/Layout';
+import AdminSideBar from '../../../components/AdminSidebar';
 import useStyles from '../../../utils/styles';
 import { Controller, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
@@ -116,32 +115,7 @@ function UserEdit({ params }) {
   return (
     <Layout title={`Edit User ${userId}`}>
       <Grid container spacing={1}>
-        <Grid item md={3} xs={12}>
-          <Card className={classes.section}>
-            <List>
-              <NextLink href="/admin/dashboard" passHref>
-                <ListItem button component="a">
-                  <ListItemText primary="Admin Dashboard"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/orders" passHref>
-                <ListItem button component="a">
-                  <ListItemText primary="Orders"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/products" passHref>
-                <ListItem button component="a">
-                  <ListItemText primary="Products"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/users" passHref>
-                <ListItem selected button component="a">
-                  <ListItemText primary="Users"></ListItemText>
-                </ListItem>
-              </NextLink>
-            </List>
-          </Card>
-        </Grid>
+        <AdminSideBar activeSelect={'user'} />
         <Grid item md={9} xs={12}>
           <Card className={classes.section}>
             <List>

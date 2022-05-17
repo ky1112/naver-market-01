@@ -11,7 +11,6 @@ import {
   Typography,
   Card,
   Button,
-  ListItemText,
   CardContent,
   CardActions,
 } from '@material-ui/core';
@@ -19,6 +18,7 @@ import { Bar } from 'react-chartjs-2';
 import { getError } from '../../utils/error';
 import { Store } from '../../utils/Store';
 import Layout from '../../components/Layout';
+import AdminSideBar from '../../components/AdminSidebar';
 import useStyles from '../../utils/styles';
 
 function reducer(state, action) {
@@ -66,37 +66,7 @@ function AdminDashboard() {
   return (
     <Layout title="Admin Dashboard">
       <Grid container spacing={1}>
-        <Grid item md={3} xs={12}>
-          <Card className={classes.section}>
-            <List>
-              <NextLink href="/admin/dashboard" passHref>
-                <ListItem selected button component="a">
-                  <ListItemText primary="대시보드"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/category" passHref>
-                <ListItem button component="a">
-                  <ListItemText primary="카테고리"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/orders" passHref>
-                <ListItem button component="a">
-                  <ListItemText primary="주문리스트"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/products" passHref>
-                <ListItem button component="a">
-                  <ListItemText primary="상품"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/users" passHref>
-                <ListItem button component="a">
-                  <ListItemText primary="회원관리"></ListItemText>
-                </ListItem>
-              </NextLink>
-            </List>
-          </Card>
-        </Grid>
+        <AdminSideBar activeSelect={'dashboard'} />
         <Grid item md={9} xs={12}>
           <Card className={classes.section}>
             <List>
