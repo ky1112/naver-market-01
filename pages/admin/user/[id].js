@@ -36,17 +36,6 @@ function reducer(state, action) {
       return { ...state, loadingUpdate: false, errorUpdate: '' };
     case 'UPDATE_FAIL':
       return { ...state, loadingUpdate: false, errorUpdate: action.payload };
-    case 'UPLOAD_REQUEST':
-      return { ...state, loadingUpload: true, errorUpload: '' };
-    case 'UPLOAD_SUCCESS':
-      return {
-        ...state,
-        loadingUpload: false,
-        errorUpload: '',
-      };
-    case 'UPLOAD_FAIL':
-      return { ...state, loadingUpload: false, errorUpload: action.payload };
-
     default:
       return state;
   }
@@ -84,6 +73,8 @@ function UserEdit({ params }) {
           setIsAdmin(data.isAdmin);
           dispatch({ type: 'FETCH_SUCCESS' });
           setValue('name', data.name);
+          // setValue('password', data.password);
+          // setValue('confirmPassword', data.confirmPassword);
         } catch (err) {
           dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
         }
@@ -92,14 +83,21 @@ function UserEdit({ params }) {
     }
   }, []);
 
-  const submitHandler = async ({ name }) => {
+  const submitHandler = async ({ name, password, confirmPassword }) => {
     closeSnackbar();
+
+    if (password !== confirmPassword) {
+      enqueueSnackbar('비번을 정확히 입력하세요', { variant: 'error' });
+      return;
+    }
+
     try {
       dispatch({ type: 'UPDATE_REQUEST' });
       await axios.put(
         `/api/admin/users/${userId}`,
         {
           name,
+          password,
           isAdmin,
         },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
@@ -157,6 +155,67 @@ function UserEdit({ params }) {
                         )}
                       ></Controller>
                     </ListItem>
+
+                    <ListItem>
+                      <Controller
+                        name="password"
+                        control={control}
+                        defaultValue=""
+                        rules={{
+                          validate: (value) =>
+                            value === '' ||
+                            value.length > 5 ||
+                            '비번은 최소 6글자이상이여야 합니다.',
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            variant="outlined"
+                            fullWidth
+                            id="password"
+                            label="Password"
+                            inputProps={{ type: 'password' }}
+                            error={Boolean(errors.password)}
+                            helperText={
+                              errors.password
+                                ? '비번은 최소 6글자이상이여야 합니다.'
+                                : ''
+                            }
+                            {...field}
+                          ></TextField>
+                        )}
+                      ></Controller>
+                    </ListItem>
+
+                    <ListItem>
+                      <Controller
+                        name="confirmPassword"
+                        control={control}
+                        defaultValue=""
+                        rules={{
+                          validate: (value) =>
+                            value === '' ||
+                            value.length > 5 ||
+                            '비번은 최소 6글자이상이여야 합니다.',
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            variant="outlined"
+                            fullWidth
+                            id="confirmPassword"
+                            label="Confirm Password"
+                            inputProps={{ type: 'password' }}
+                            error={Boolean(errors.confirmPassword)}
+                            helperText={
+                              errors.password
+                                ? '비번은 최소 6글자이상이여야 합니다.'
+                                : ''
+                            }
+                            {...field}
+                          ></TextField>
+                        )}
+                      ></Controller>
+                    </ListItem>
+
                     <ListItem>
                       <FormControlLabel
                         label="Is Admin"
@@ -169,6 +228,7 @@ function UserEdit({ params }) {
                         }
                       ></FormControlLabel>
                     </ListItem>
+
                     <ListItem>
                       <Button
                         variant="contained"

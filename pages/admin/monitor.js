@@ -1,7 +1,7 @@
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
+
 import React, { useEffect, useContext, useReducer } from 'react';
 import {
   CircularProgress,
@@ -46,7 +46,7 @@ function reducer(state, action) {
   }
 }
 
-function AdminUsers() {
+function MonitorUser() {
   const { state } = useContext(Store);
   const router = useRouter();
   const classes = useStyles();
@@ -66,9 +66,10 @@ function AdminUsers() {
     const fetchData = async () => {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
-        const { data } = await axios.get(`/api/admin/users`, {
+        const { data } = await axios.get(`/api/admin/monitor`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
+        console.log({ data });
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
@@ -102,13 +103,13 @@ function AdminUsers() {
   return (
     <Layout title="Users">
       <Grid container spacing={1}>
-        <AdminSideBar activeSelect={'user'} />
+        <AdminSideBar activeSelect={'monitoring'} />
         <Grid item md={9} xs={12}>
           <Card className={classes.section}>
             <List>
               <ListItem>
                 <Typography component="h1" variant="h1">
-                  회원관리
+                  실시간모니터링
                 </Typography>
                 {loadingDelete && <CircularProgress />}
               </ListItem>
@@ -124,32 +125,28 @@ function AdminUsers() {
                       <TableHead>
                         <TableRow>
                           {/* <TableCell>ID</TableCell> */}
-                          <TableCell>아이디</TableCell>
-                          <TableCell>이메일</TableCell>
-                          <TableCell>비번</TableCell>
-                          <TableCell>관리자</TableCell>
-                          <TableCell>기타</TableCell>
+                          <TableCell>No</TableCell>
+                          <TableCell>UserID</TableCell>
+                          <TableCell>IP</TableCell>
+                          <TableCell>상품ID</TableCell>
+                          <TableCell>상품명</TableCell>
+                          <TableCell>위치</TableCell>
+                          <TableCell>진행</TableCell>
+                          <TableCell>기기</TableCell>
+                          <TableCell>접속시간</TableCell>
+                          <TableCell>상품코드</TableCell>
+                          <TableCell>상세</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {users.map((user) => (
                           <TableRow key={user._id}>
-                            {/* <TableCell>{user._id.substring(20, 24)}</TableCell> */}
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.password2}</TableCell>
+                            <TableCell>{user._id.substring(20, 24)}</TableCell>
+                            <TableCell>{user.user}</TableCell>
+                            <TableCell>{user.ip}</TableCell>
+                            <TableCell>{user.sessionID}</TableCell>
+                            <TableCell>{user.isConnected}</TableCell>
                             <TableCell>
-                              {user.isAdmin ? '예' : '아니'}
-                            </TableCell>
-                            <TableCell>
-                              <NextLink
-                                href={`/admin/user/${user._id}`}
-                                passHref
-                              >
-                                <Button size="small" variant="contained">
-                                  변경
-                                </Button>
-                              </NextLink>{' '}
                               <Button
                                 onClick={() => deleteHandler(user._id)}
                                 size="small"
@@ -173,4 +170,4 @@ function AdminUsers() {
   );
 }
 
-export default dynamic(() => Promise.resolve(AdminUsers), { ssr: false });
+export default dynamic(() => Promise.resolve(MonitorUser), { ssr: false });

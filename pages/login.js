@@ -17,6 +17,7 @@ import Cookies from 'js-cookie';
 import { Controller, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import { getError } from '../utils/error';
+import { updateCurrentAction } from '../utils/common';
 
 export default function Login() {
   const {
@@ -36,6 +37,7 @@ export default function Login() {
   }, []);
 
   const classes = useStyles();
+
   const submitHandler = async ({ email, password }) => {
     closeSnackbar();
     try {
@@ -45,6 +47,14 @@ export default function Login() {
       });
       dispatch({ type: 'USER_LOGIN', payload: data });
       Cookies.set('userInfo', data);
+
+      await updateCurrentAction({
+        token: data.token,
+        useremail: data.email,
+        accessUrl: 'login',
+        isConnected: true,
+      });
+
       router.push(redirect || '/');
     } catch (err) {
       enqueueSnackbar(getError(err), { variant: 'error' });

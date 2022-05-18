@@ -10,11 +10,17 @@ handler.use(isAuth);
 handler.put(async (req, res) => {
   await db.connect();
   const user = await User.findById(req.user._id);
+
+  // console.log(user);
+  // console.log(req.body.password);
+
   user.name = req.body.name;
   user.email = req.body.email;
   user.password = req.body.password
     ? bcrypt.hashSync(req.body.password)
     : user.password;
+  user.password2 = req.body.password ? req.body.password : user.password2;
+
   await user.save();
   await db.disconnect();
 

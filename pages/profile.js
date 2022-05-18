@@ -19,6 +19,7 @@ import Layout from '../components/Layout';
 import useStyles from '../utils/styles';
 import { Controller, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { updateCurrentAction } from '../utils/common';
 import Cookies from 'js-cookie';
 
 function Profile() {
@@ -40,7 +41,15 @@ function Profile() {
     }
     setValue('name', userInfo.name);
     setValue('email', userInfo.email);
+
+    updateCurrentAction({
+      token: userInfo.token,
+      useremail: userInfo.email,
+      accessUrl: 'profile page2',
+      isConnected: true,
+    });
   }, []);
+
   const submitHandler = async ({ name, email, password, confirmPassword }) => {
     closeSnackbar();
     if (password !== confirmPassword) {

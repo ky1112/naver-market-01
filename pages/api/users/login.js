@@ -9,6 +9,12 @@ const handler = nc();
 handler.post(async (req, res) => {
   await db.connect();
   const user = await User.findOne({ email: req.body.email });
+  /*
+  const clientIp =
+    (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+    req.socket.remoteAddress;
+  */
+
   await db.disconnect();
   if (user && bcrypt.compareSync(req.body.password, user.password)) {
     const token = signToken(user);
@@ -17,6 +23,7 @@ handler.post(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      //clientIp: clientIp,
       isAdmin: user.isAdmin,
     });
   } else {
