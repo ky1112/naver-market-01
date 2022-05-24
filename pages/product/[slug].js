@@ -92,7 +92,7 @@ export default function ProductScreen(props) {
       <div className={classes.section}>
         <NextLink href="/" passHref>
           <Link>
-            <Typography>back to products</Typography>
+            <Typography>돌아가기</Typography>
           </Link>
         </NextLink>
       </div>

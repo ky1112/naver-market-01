@@ -23,6 +23,7 @@ import { Store } from '../../utils/Store';
 import Layout from '../../components/Layout';
 import AdminSideBar from '../../components/AdminSidebar';
 import useStyles from '../../utils/styles';
+import { clearCookies } from '../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -38,12 +39,12 @@ function reducer(state, action) {
 }
 
 function AdminOrders() {
-  const { state } = useContext(Store);
+  const { state, dispatch } = useContext(Store);
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
 
-  const [{ loading, error, orders }, dispatch] = useReducer(reducer, {
+  const [{ loading, error, orders }, dispatch_local] = useReducer(reducer, {
     loading: true,
     orders: [],
     error: '',
@@ -55,20 +56,26 @@ function AdminOrders() {
     }
     const fetchData = async () => {
       try {
-        dispatch({ type: 'FETCH_REQUEST' });
+        dispatch_local({ type: 'FETCH_REQUEST' });
         const { data } = await axios.get(`/api/admin/orders`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch_local({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
-        console.log(err);
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+        if (getError(err) == 'Token is not valid') {
+          clearCookies();
+          await dispatch({
+            type: 'USER_LOGOUT',
+          });
+
+          router.push('/login?redirect=/admin/orders');
+        } else dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
     fetchData();
   }, []);
   return (
-    <Layout title="Orders">
+    <Layout title="주문내역관리" isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'order'} />
         <Grid item md={9} xs={12}>
@@ -76,7 +83,7 @@ function AdminOrders() {
             <List>
               <ListItem>
                 <Typography component="h1" variant="h1">
-                  Orders
+                  주문내역
                 </Typography>
               </ListItem>
 
@@ -91,12 +98,12 @@ function AdminOrders() {
                       <TableHead>
                         <TableRow>
                           <TableCell>ID</TableCell>
-                          <TableCell>USER</TableCell>
-                          <TableCell>DATE</TableCell>
-                          <TableCell>TOTAL</TableCell>
-                          <TableCell>PAID</TableCell>
-                          <TableCell>DELIVERED</TableCell>
-                          <TableCell>ACTION</TableCell>
+                          <TableCell>아이디</TableCell>
+                          <TableCell>날짜</TableCell>
+                          <TableCell>금액</TableCell>
+                          <TableCell>지불상태</TableCell>
+                          <TableCell>배송상태</TableCell>
+                          <TableCell>기타</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -120,7 +127,7 @@ function AdminOrders() {
                             </TableCell>
                             <TableCell>
                               <NextLink href={`/order/${order._id}`} passHref>
-                                <Button variant="contained">Details</Button>
+                                <Button variant="contained">자세히보기</Button>
                               </NextLink>
                             </TableCell>
                           </TableRow>

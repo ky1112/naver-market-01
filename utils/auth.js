@@ -4,6 +4,7 @@ const signToken = (user) => {
   return jwt.sign(
     {
       _id: user._id,
+      userid: user.userid,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
@@ -12,7 +13,7 @@ const signToken = (user) => {
     process.env.JWT_SECRET,
 
     {
-      expiresIn: '30d',
+      expiresIn: '10m',
     }
   );
 };

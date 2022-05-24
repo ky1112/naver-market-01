@@ -11,9 +11,9 @@ handler.use(isAuth);
 
 handler.get(async (req, res) => {
   await db.connect();
-  const orders = await Monitor.find({});
+  const rows = await Monitor.find({ isConnected: true });
   await db.disconnect();
-  res.send(orders);
+  res.send(rows);
 });
 
 export default handler;

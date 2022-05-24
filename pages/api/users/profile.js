@@ -28,6 +28,7 @@ handler.put(async (req, res) => {
   res.send({
     token,
     _id: user._id,
+    userid: user.userid,
     name: user.name,
     email: user.email,
     isAdmin: user.isAdmin,

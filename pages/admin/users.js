@@ -24,6 +24,7 @@ import Layout from '../../components/Layout';
 import AdminSideBar from '../../components/AdminSidebar';
 import useStyles from '../../utils/styles';
 import { useSnackbar } from 'notistack';
+import { clearCookies } from '../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -47,17 +48,19 @@ function reducer(state, action) {
 }
 
 function AdminUsers() {
-  const { state } = useContext(Store);
+  const { state, dispatch } = useContext(Store);
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
 
-  const [{ loading, error, users, successDelete, loadingDelete }, dispatch] =
-    useReducer(reducer, {
-      loading: true,
-      users: [],
-      error: '',
-    });
+  const [
+    { loading, error, users, successDelete, loadingDelete },
+    dispatch_local,
+  ] = useReducer(reducer, {
+    loading: true,
+    users: [],
+    error: '',
+  });
 
   useEffect(() => {
     if (!userInfo) {
@@ -65,17 +68,24 @@ function AdminUsers() {
     }
     const fetchData = async () => {
       try {
-        dispatch({ type: 'FETCH_REQUEST' });
+        dispatch_local({ type: 'FETCH_REQUEST' });
         const { data } = await axios.get(`/api/admin/users`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch_local({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+        if (getError(err) == 'Token is not valid') {
+          clearCookies();
+          await dispatch({
+            type: 'USER_LOGOUT',
+          });
+
+          router.push('/login?redirect=/admin/user');
+        } else dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
     if (successDelete) {
-      dispatch({ type: 'DELETE_RESET' });
+      dispatch_local({ type: 'DELETE_RESET' });
     } else {
       fetchData();
     }
@@ -88,22 +98,22 @@ function AdminUsers() {
       return;
     }
     try {
-      dispatch({ type: 'DELETE_REQUEST' });
+      dispatch_local({ type: 'DELETE_REQUEST' });
       await axios.delete(`/api/admin/users/${userId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
-      dispatch({ type: 'DELETE_SUCCESS' });
+      dispatch_local({ type: 'DELETE_SUCCESS' });
       enqueueSnackbar('User deleted successfully', { variant: 'success' });
     } catch (err) {
-      dispatch({ type: 'DELETE_FAIL' });
+      dispatch_local({ type: 'DELETE_FAIL' });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
   return (
-    <Layout title="Users">
+    <Layout title="Users" isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'user'} />
-        <Grid item md={9} xs={12}>
+        <Grid item md={11} xs={12}>
           <Card className={classes.section}>
             <List>
               <ListItem>
@@ -128,6 +138,7 @@ function AdminUsers() {
                           <TableCell>이메일</TableCell>
                           <TableCell>비번</TableCell>
                           <TableCell>관리자</TableCell>
+                          <TableCell>가입일</TableCell>
                           <TableCell>기타</TableCell>
                         </TableRow>
                       </TableHead>
@@ -141,6 +152,7 @@ function AdminUsers() {
                             <TableCell>
                               {user.isAdmin ? '예' : '아니'}
                             </TableCell>
+                            <TableCell>{user.createdAt}</TableCell>
                             <TableCell>
                               <NextLink
                                 href={`/admin/user/${user._id}`}

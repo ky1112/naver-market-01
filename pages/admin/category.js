@@ -24,6 +24,9 @@ import Layout from '../../components/Layout';
 import AdminSideBar from '../../components/AdminSidebar';
 import useStyles from '../../utils/styles';
 import { useSnackbar } from 'notistack';
+import { clearCookies } from '../../utils/common';
+// import Cookies from 'js-cookie';
+// import { updateCurrentAction } from '../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -58,14 +61,14 @@ function reducer(state, action) {
 }
 
 function AdminCategories() {
-  const { state } = useContext(Store);
+  const { state, dispatch } = useContext(Store);
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
 
   const [
     { loading, error, categories, loadingCreate, successDelete, loadingDelete },
-    dispatch,
+    dispatch_local,
   ] = useReducer(reducer, {
     loading: true,
     categories: [],
@@ -78,17 +81,24 @@ function AdminCategories() {
     }
     const fetchData = async () => {
       try {
-        dispatch({ type: 'FETCH_REQUEST' });
+        dispatch_local({ type: 'FETCH_REQUEST' });
         const { data } = await axios.get(`/api/admin/categories`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch_local({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+        if (getError(err) == 'Token is not valid') {
+          clearCookies();
+          await dispatch({
+            type: 'USER_LOGOUT',
+          });
+
+          router.push('/login?redirect=/admin/category');
+        } else dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
     if (successDelete) {
-      dispatch({ type: 'DELETE_RESET' });
+      dispatch_local({ type: 'DELETE_RESET' });
     } else {
       fetchData();
     }
@@ -100,7 +110,7 @@ function AdminCategories() {
       return;
     }
     try {
-      dispatch({ type: 'CREATE_REQUEST' });
+      dispatch_local({ type: 'CREATE_REQUEST' });
       const { data } = await axios.post(
         `/api/admin/categories`,
         {},
@@ -108,11 +118,11 @@ function AdminCategories() {
           headers: { authorization: `Bearer ${userInfo.token}` },
         }
       );
-      dispatch({ type: 'CREATE_SUCCESS' });
+      dispatch_local({ type: 'CREATE_SUCCESS' });
       enqueueSnackbar('Category created successfully', { variant: 'success' });
       router.push(`/admin/category/${data.category._id}`);
     } catch (err) {
-      dispatch({ type: 'CREATE_FAIL' });
+      dispatch_local({ type: 'CREATE_FAIL' });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
@@ -122,19 +132,19 @@ function AdminCategories() {
       return;
     }
     try {
-      dispatch({ type: 'DELETE_REQUEST' });
+      dispatch_local({ type: 'DELETE_REQUEST' });
       await axios.delete(`/api/admin/categories/${categoryId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
-      dispatch({ type: 'DELETE_SUCCESS' });
+      dispatch_local({ type: 'DELETE_SUCCESS' });
       enqueueSnackbar('Product deleted successfully', { variant: 'success' });
     } catch (err) {
-      dispatch({ type: 'DELETE_FAIL' });
+      dispatch_local({ type: 'DELETE_FAIL' });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
   return (
-    <Layout title="카테고리">
+    <Layout title="카테고리" isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'category'} />
         <Grid item md={9} xs={12}>
@@ -154,7 +164,7 @@ function AdminCategories() {
                       color="primary"
                       variant="contained"
                     >
-                      Create
+                      새카테고리
                     </Button>
                     {loadingCreate && <CircularProgress />}
                   </Grid>
@@ -177,7 +187,7 @@ function AdminCategories() {
                           <TableCell>슬러그</TableCell>
                           <TableCell>태그(서브카테고리)</TableCell>
                           <TableCell>유저</TableCell>
-                          <TableCell>ACTIONS</TableCell>
+                          <TableCell>기타</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -203,7 +213,7 @@ function AdminCategories() {
                                 passHref
                               >
                                 <Button size="small" variant="contained">
-                                  Edit
+                                  변경
                                 </Button>
                               </NextLink>{' '}
                               <Button
@@ -211,7 +221,7 @@ function AdminCategories() {
                                 size="small"
                                 variant="contained"
                               >
-                                Delete
+                                삭제
                               </Button>
                             </TableCell>
                           </TableRow>

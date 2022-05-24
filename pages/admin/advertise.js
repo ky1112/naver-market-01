@@ -17,14 +17,13 @@ import {
   MenuItem,
 } from '@material-ui/core';
 
-import { getError } from '../../../utils/error';
-import { Store } from '../../../utils/Store';
-import Layout from '../../../components/Layout';
-import AdminSideBar from '../../../components/AdminSidebar';
-import useStyles from '../../../utils/styles';
+import { getError } from '../../utils/error';
+import { Store } from '../../utils/Store';
+import Layout from '../../components/Layout';
+import AdminSideBar from '../../components/AdminSidebar';
+import useStyles from '../../utils/styles';
 import { Controller, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
-import { clearCookies } from '../../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -63,10 +62,10 @@ function reducer(state, action) {
 
 function ProductEdit({ params }) {
   const productId = params.id;
-  const { state, dispatch } = useContext(Store);
+  const { state } = useContext(Store);
   const [
     { loading, error, loadingUpdate, loadingUpload, categories },
-    dispatch_local,
+    dispatch,
   ] = useReducer(reducer, {
     loading: true,
     error: '',
@@ -87,7 +86,7 @@ function ProductEdit({ params }) {
 
   const fetchData = async () => {
     try {
-      dispatch_local({ type: 'FETCH_REQUEST' });
+      dispatch({ type: 'FETCH_REQUEST' });
       const { data } = await axios.get(`/api/admin/products/${productId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
@@ -96,7 +95,7 @@ function ProductEdit({ params }) {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
 
-      dispatch_local({ type: 'FETCH_SUCCESS', payload: res.data });
+      dispatch({ type: 'FETCH_SUCCESS', payload: res.data });
 
       //categories.current = res.data;
       //console.log(categories);
@@ -112,14 +111,7 @@ function ProductEdit({ params }) {
       setValue('countInStock', data.countInStock);
       setValue('description', data.description);
     } catch (err) {
-      if (getError(err) == 'Token is not valid') {
-        clearCookies();
-        await dispatch({
-          type: 'USER_LOGOUT',
-        });
-
-        router.push(`/login?redirect=/admin/product/${productId}`);
-      } else dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
+      dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
     }
   };
 
@@ -136,18 +128,18 @@ function ProductEdit({ params }) {
     const bodyFormData = new FormData();
     bodyFormData.append('file', file);
     try {
-      dispatch_local({ type: 'UPLOAD_REQUEST' });
+      dispatch({ type: 'UPLOAD_REQUEST' });
       const { data } = await axios.post('/api/admin/upload', bodyFormData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           authorization: `Bearer ${userInfo.token}`,
         },
       });
-      dispatch_local({ type: 'UPLOAD_SUCCESS' });
+      dispatch({ type: 'UPLOAD_SUCCESS' });
       setValue(imageField, data.secure_url);
       enqueueSnackbar('File uploaded successfully', { variant: 'success' });
     } catch (err) {
-      dispatch_local({ type: 'UPLOAD_FAIL', payload: getError(err) });
+      dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
@@ -165,7 +157,7 @@ function ProductEdit({ params }) {
   }) => {
     closeSnackbar();
     try {
-      dispatch_local({ type: 'UPDATE_REQUEST' });
+      dispatch({ type: 'UPDATE_REQUEST' });
       await axios.put(
         `/api/admin/products/${productId}`,
         {
@@ -182,11 +174,11 @@ function ProductEdit({ params }) {
         },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
       );
-      dispatch_local({ type: 'UPDATE_SUCCESS' });
+      dispatch({ type: 'UPDATE_SUCCESS' });
       enqueueSnackbar('Product updated successfully', { variant: 'success' });
       router.push('/admin/products');
     } catch (err) {
-      dispatch_local({ type: 'UPDATE_FAIL', payload: getError(err) });
+      dispatch({ type: 'UPDATE_FAIL', payload: getError(err) });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };

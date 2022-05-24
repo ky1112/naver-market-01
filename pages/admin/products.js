@@ -24,6 +24,7 @@ import Layout from '../../components/Layout';
 import AdminSideBar from '../../components/AdminSidebar';
 import useStyles from '../../utils/styles';
 import { useSnackbar } from 'notistack';
+import { clearCookies } from '../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -53,14 +54,14 @@ function reducer(state, action) {
 }
 
 function AdminProdcuts() {
-  const { state } = useContext(Store);
+  const { state, dispatch } = useContext(Store);
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
 
   const [
     { loading, error, products, loadingCreate, successDelete, loadingDelete },
-    dispatch,
+    dispatch_local,
   ] = useReducer(reducer, {
     loading: true,
     products: [],
@@ -73,17 +74,24 @@ function AdminProdcuts() {
     }
     const fetchData = async () => {
       try {
-        dispatch({ type: 'FETCH_REQUEST' });
+        dispatch_local({ type: 'FETCH_REQUEST' });
         const { data } = await axios.get(`/api/admin/products`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch_local({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+        if (getError(err) == 'Token is not valid') {
+          clearCookies();
+          await dispatch({
+            type: 'USER_LOGOUT',
+          });
+
+          router.push('/login?redirect=/admin/products');
+        } else dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
     if (successDelete) {
-      dispatch({ type: 'DELETE_RESET' });
+      dispatch_local({ type: 'DELETE_RESET' });
     } else {
       fetchData();
     }
@@ -95,7 +103,7 @@ function AdminProdcuts() {
       return;
     }
     try {
-      dispatch({ type: 'CREATE_REQUEST' });
+      dispatch_local({ type: 'CREATE_REQUEST' });
       const { data } = await axios.post(
         `/api/admin/products`,
         {},
@@ -103,11 +111,11 @@ function AdminProdcuts() {
           headers: { authorization: `Bearer ${userInfo.token}` },
         }
       );
-      dispatch({ type: 'CREATE_SUCCESS' });
+      dispatch_local({ type: 'CREATE_SUCCESS' });
       enqueueSnackbar('Product created successfully', { variant: 'success' });
       router.push(`/admin/product/${data.product._id}`);
     } catch (err) {
-      dispatch({ type: 'CREATE_FAIL' });
+      dispatch_local({ type: 'CREATE_FAIL' });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
@@ -116,19 +124,19 @@ function AdminProdcuts() {
       return;
     }
     try {
-      dispatch({ type: 'DELETE_REQUEST' });
+      dispatch_local({ type: 'DELETE_REQUEST' });
       await axios.delete(`/api/admin/products/${productId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
-      dispatch({ type: 'DELETE_SUCCESS' });
+      dispatch_local({ type: 'DELETE_SUCCESS' });
       enqueueSnackbar('Product deleted successfully', { variant: 'success' });
     } catch (err) {
-      dispatch({ type: 'DELETE_FAIL' });
+      dispatch_local({ type: 'DELETE_FAIL' });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
   return (
-    <Layout title="Products">
+    <Layout title="상품관리" isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'product'} />
         <Grid item md={9} xs={12}>
@@ -138,7 +146,7 @@ function AdminProdcuts() {
                 <Grid container alignItems="center">
                   <Grid item xs={6}>
                     <Typography component="h1" variant="h1">
-                      Products
+                      상품관리
                     </Typography>
                     {loadingDelete && <CircularProgress />}
                   </Grid>
@@ -148,7 +156,7 @@ function AdminProdcuts() {
                       color="primary"
                       variant="contained"
                     >
-                      Create
+                      새상품추가
                     </Button>
                     {loadingCreate && <CircularProgress />}
                   </Grid>
@@ -166,12 +174,12 @@ function AdminProdcuts() {
                       <TableHead>
                         <TableRow>
                           <TableCell>ID</TableCell>
-                          <TableCell>NAME</TableCell>
-                          <TableCell>PRICE</TableCell>
-                          <TableCell>CATEGORY</TableCell>
-                          <TableCell>COUNT</TableCell>
-                          <TableCell>RATING</TableCell>
-                          <TableCell>ACTIONS</TableCell>
+                          <TableCell>상품명</TableCell>
+                          <TableCell>가격</TableCell>
+                          <TableCell>카테고리</TableCell>
+                          <TableCell>수량</TableCell>
+                          <TableCell>별점</TableCell>
+                          <TableCell>기타</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>

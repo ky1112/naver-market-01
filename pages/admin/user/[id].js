@@ -21,6 +21,7 @@ import AdminSideBar from '../../../components/AdminSidebar';
 import useStyles from '../../../utils/styles';
 import { Controller, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { clearCookies } from '../../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -43,11 +44,14 @@ function reducer(state, action) {
 
 function UserEdit({ params }) {
   const userId = params.id;
-  const { state } = useContext(Store);
-  const [{ loading, error, loadingUpdate }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-  });
+  const { state, dispatch } = useContext(Store);
+  const [{ loading, error, loadingUpdate }, dispatch_local] = useReducer(
+    reducer,
+    {
+      loading: true,
+      error: '',
+    }
+  );
   const {
     handleSubmit,
     control,
@@ -66,17 +70,24 @@ function UserEdit({ params }) {
     } else {
       const fetchData = async () => {
         try {
-          dispatch({ type: 'FETCH_REQUEST' });
+          dispatch_local({ type: 'FETCH_REQUEST' });
           const { data } = await axios.get(`/api/admin/users/${userId}`, {
             headers: { authorization: `Bearer ${userInfo.token}` },
           });
           setIsAdmin(data.isAdmin);
-          dispatch({ type: 'FETCH_SUCCESS' });
+          dispatch_local({ type: 'FETCH_SUCCESS' });
           setValue('name', data.name);
           // setValue('password', data.password);
           // setValue('confirmPassword', data.confirmPassword);
         } catch (err) {
-          dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+          if (getError(err) == 'Token is not valid') {
+            clearCookies();
+            await dispatch({
+              type: 'USER_LOGOUT',
+            });
+
+            router.push(`/login?redirect=/admin/user/${userId}`);
+          } else dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
         }
       };
       fetchData();
@@ -92,7 +103,7 @@ function UserEdit({ params }) {
     }
 
     try {
-      dispatch({ type: 'UPDATE_REQUEST' });
+      dispatch_local({ type: 'UPDATE_REQUEST' });
       await axios.put(
         `/api/admin/users/${userId}`,
         {
@@ -102,16 +113,16 @@ function UserEdit({ params }) {
         },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
       );
-      dispatch({ type: 'UPDATE_SUCCESS' });
+      dispatch_local({ type: 'UPDATE_SUCCESS' });
       enqueueSnackbar('User updated successfully', { variant: 'success' });
       router.push('/admin/users');
     } catch (err) {
-      dispatch({ type: 'UPDATE_FAIL', payload: getError(err) });
+      dispatch_local({ type: 'UPDATE_FAIL', payload: getError(err) });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
   return (
-    <Layout title={`Edit User ${userId}`}>
+    <Layout title={`Edit User ${userId}`} isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'user'} />
         <Grid item md={9} xs={12}>

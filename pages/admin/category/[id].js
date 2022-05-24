@@ -25,6 +25,7 @@ import AdminSideBar from '../../../components/AdminSidebar';
 import useStyles from '../../../utils/styles';
 import { Controller, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { clearCookies } from '../../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -58,8 +59,8 @@ function reducer(state, action) {
 
 function CategoryEdit({ params }) {
   const categoryId = params.id;
-  const { state } = useContext(Store);
-  const [{ loading, error, loadingUpdate, tags }, dispatch] = useReducer(
+  const { state, dispatch } = useContext(Store);
+  const [{ loading, error, loadingUpdate, tags }, dispatch_local] = useReducer(
     reducer,
     {
       loading: true,
@@ -81,16 +82,23 @@ function CategoryEdit({ params }) {
 
   const fetchData = async () => {
     try {
-      dispatch({ type: 'FETCH_REQUEST' });
+      dispatch_local({ type: 'FETCH_REQUEST' });
       const { data } = await axios.get(`/api/admin/categories/${categoryId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
-      dispatch({ type: 'FETCH_SUCCESS', payload: data.tags });
+      dispatch_local({ type: 'FETCH_SUCCESS', payload: data.tags });
       setValue('name', data.name);
       setValue('slug', data.slug);
       //console.log(data.tags);
     } catch (err) {
-      dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+      if (getError(err) == 'Token is not valid') {
+        clearCookies();
+        await dispatch({
+          type: 'USER_LOGOUT',
+        });
+
+        router.push(`/login?redirect=/admin/category/${categoryId}`);
+      } else dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
     }
   };
 
@@ -105,7 +113,7 @@ function CategoryEdit({ params }) {
   const submitHandler = async ({ name, slug }) => {
     closeSnackbar();
     try {
-      dispatch({ type: 'UPDATE_REQUEST' });
+      dispatch_local({ type: 'UPDATE_REQUEST' });
       await axios.put(
         `/api/admin/categories/${categoryId}`,
         {
@@ -115,11 +123,11 @@ function CategoryEdit({ params }) {
         },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
       );
-      dispatch({ type: 'UPDATE_SUCCESS' });
+      dispatch_local({ type: 'UPDATE_SUCCESS' });
       enqueueSnackbar('Category updated successfully', { variant: 'success' });
       router.push('/admin/category');
     } catch (err) {
-      dispatch({ type: 'UPDATE_FAIL', payload: getError(err) });
+      dispatch_local({ type: 'UPDATE_FAIL', payload: getError(err) });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
   };
@@ -169,7 +177,7 @@ function CategoryEdit({ params }) {
   };
 
   return (
-    <Layout title={`Edit Category ${categoryId}`}>
+    <Layout title={`카테고리관리 ${categoryId}`} isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'category'} />
         <Grid item md={9} xs={12}>
@@ -177,7 +185,7 @@ function CategoryEdit({ params }) {
             <List>
               <ListItem>
                 <Typography component="h1" variant="h1">
-                  Edit Category {categoryId}
+                  카테고리아이디: {categoryId}
                 </Typography>
               </ListItem>
               <ListItem>
@@ -205,7 +213,7 @@ function CategoryEdit({ params }) {
                             variant="outlined"
                             fullWidth
                             id="name"
-                            label="Name"
+                            label="카테고리명"
                             error={Boolean(errors.name)}
                             helperText={errors.name ? 'Name is required' : ''}
                             {...field}
@@ -226,7 +234,7 @@ function CategoryEdit({ params }) {
                             variant="outlined"
                             fullWidth
                             id="slug"
-                            label="Slug"
+                            label="슬러그"
                             error={Boolean(errors.slug)}
                             helperText={errors.slug ? 'Slug is required' : ''}
                             value={value}
@@ -290,7 +298,7 @@ function CategoryEdit({ params }) {
                         fullWidth
                         color="primary"
                       >
-                        Update
+                        업데이트
                       </Button>
                       {loadingUpdate && <CircularProgress />}
                     </ListItem>

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-require('./User');
+//require('./User');
 
 const monitorSchema = new mongoose.Schema(
   {
@@ -9,6 +9,7 @@ const monitorSchema = new mongoose.Schema(
     token: { type: String },
     accessUrl: { type: String },
     isConnected: { type: Boolean, required: true, default: false },
+    isMobile: { type: Boolean },
   },
   {
     timestamps: true,
@@ -17,4 +18,5 @@ const monitorSchema = new mongoose.Schema(
 
 const Monitor =
   mongoose.models.Monitor || mongoose.model('Monitor', monitorSchema);
+
 export default Monitor;

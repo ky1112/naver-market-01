@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import { Bar } from 'react-chartjs-2';
 import { getError } from '../../utils/error';
+import { clearCookies } from '../../utils/common';
 import { Store } from '../../utils/Store';
 import Layout from '../../components/Layout';
 import AdminSideBar from '../../components/AdminSidebar';
@@ -35,36 +36,47 @@ function reducer(state, action) {
 }
 
 function AdminDashboard() {
-  const { state } = useContext(Store);
+  const { state, dispatch } = useContext(Store);
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
 
-  const [{ loading, error, summary }, dispatch] = useReducer(reducer, {
+  const [{ loading, error, summary }, dispatch_local] = useReducer(reducer, {
     loading: true,
     summary: { salesData: [] },
     error: '',
   });
 
+  const fetchData = async () => {
+    try {
+      dispatch_local({ type: 'FETCH_REQUEST' });
+      const { data } = await axios.get(`/api/admin/summary`, {
+        headers: { authorization: `Bearer ${userInfo.token}` },
+      });
+      dispatch_local({ type: 'FETCH_SUCCESS', payload: data });
+    } catch (err) {
+      if (getError(err) == 'Token is not valid') {
+        clearCookies();
+        await dispatch({
+          type: 'USER_LOGOUT',
+        });
+
+        router.push('/login?redirect=/admin/dashboard');
+      } else {
+        dispatch_local({ type: 'FETCH_FAIL', payload: getError(err) });
+      }
+    }
+  };
+
   useEffect(() => {
     if (!userInfo) {
       router.push('/login');
     }
-    const fetchData = async () => {
-      try {
-        dispatch({ type: 'FETCH_REQUEST' });
-        const { data } = await axios.get(`/api/admin/summary`, {
-          headers: { authorization: `Bearer ${userInfo.token}` },
-        });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
-      } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
-      }
-    };
     fetchData();
   }, []);
+
   return (
-    <Layout title="Admin Dashboard">
+    <Layout title="관리자 대시보드" isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'dashboard'} />
         <Grid item md={9} xs={12}>
@@ -83,12 +95,12 @@ function AdminDashboard() {
                           <Typography variant="h1">
                             ${summary.ordersPrice}
                           </Typography>
-                          <Typography>Sales</Typography>
+                          <Typography>총판매금액</Typography>
                         </CardContent>
                         <CardActions>
                           <NextLink href="/admin/orders" passHref>
                             <Button size="small" color="primary">
-                              View sales
+                              주문내역보기
                             </Button>
                           </NextLink>
                         </CardActions>
@@ -100,12 +112,12 @@ function AdminDashboard() {
                           <Typography variant="h1">
                             {summary.ordersCount}
                           </Typography>
-                          <Typography>Orders</Typography>
+                          <Typography>총 주문건수</Typography>
                         </CardContent>
                         <CardActions>
                           <NextLink href="/admin/orders" passHref>
                             <Button size="small" color="primary">
-                              View orders
+                              주문내역보기
                             </Button>
                           </NextLink>
                         </CardActions>
@@ -117,12 +129,12 @@ function AdminDashboard() {
                           <Typography variant="h1">
                             {summary.productsCount}
                           </Typography>
-                          <Typography>Products</Typography>
+                          <Typography>상품개수</Typography>
                         </CardContent>
                         <CardActions>
                           <NextLink href="/admin/products" passHref>
                             <Button size="small" color="primary">
-                              View products
+                              상품보기
                             </Button>
                           </NextLink>
                         </CardActions>
@@ -134,12 +146,12 @@ function AdminDashboard() {
                           <Typography variant="h1">
                             {summary.usersCount}
                           </Typography>
-                          <Typography>Users</Typography>
+                          <Typography>총 사용자수</Typography>
                         </CardContent>
                         <CardActions>
                           <NextLink href="/admin/users" passHref>
                             <Button size="small" color="primary">
-                              View users
+                              사용자보기
                             </Button>
                           </NextLink>
                         </CardActions>
@@ -150,7 +162,7 @@ function AdminDashboard() {
               </ListItem>
               <ListItem>
                 <Typography component="h1" variant="h1">
-                  Sales Chart
+                  판매실적차트
                 </Typography>
               </ListItem>
               <ListItem>
@@ -159,10 +171,15 @@ function AdminDashboard() {
                     labels: summary.salesData.map((x) => x._id),
                     datasets: [
                       {
-                        label: 'Sales',
+                        label: '판매',
                         backgroundColor: 'rgba(162, 222, 208, 1)',
                         data: summary.salesData.map((x) => x.totalSales),
                       },
+                      // {
+                      //   label: '판매',
+                      //   backgroundColor: 'rgba(162, 222, 208, 1)',
+                      //   data: summary.salesData.map((x) => x.totalSales),
+                      // },
                     ],
                   }}
                   options={{

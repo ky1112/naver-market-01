@@ -47,7 +47,9 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuList from '@material-ui/core/MenuList';
 
-export default function Layout({ title, description, children }) {
+import { updateCurrentAction } from '../utils/common';
+
+export default function Layout({ title, description, children, isAdminPage }) {
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const { darkMode, cart, userInfo } = state;
@@ -91,7 +93,6 @@ export default function Layout({ title, description, children }) {
 
   const fetchCategories = async () => {
     try {
-      //const { data } = await axios.get(`/api/products/categories`);
       const { data } = await axios.get(`/api/categories/categories`);
       setCategories(data);
     } catch (err) {
@@ -136,6 +137,14 @@ export default function Layout({ title, description, children }) {
   const logoutClickHandler = () => {
     setAnchorEl(null);
     dispatch({ type: 'USER_LOGOUT' });
+
+    updateCurrentAction({
+      token: userInfo.token,
+      useremail: userInfo.email,
+      accessUrl: 'logged out',
+      isConnected: false,
+    });
+
     Cookies.remove('userInfo');
     Cookies.remove('cartItems');
     Cookies.remove('shippinhAddress');
@@ -245,7 +254,7 @@ export default function Layout({ title, description, children }) {
                 <InputBase
                   name="query"
                   className={classes.searchInput}
-                  placeholder="Search products"
+                  placeholder="상품명을 입력하세요"
                   onChange={queryChangeHandler}
                 />
                 <IconButton
@@ -270,10 +279,10 @@ export default function Layout({ title, description, children }) {
                         color="secondary"
                         badgeContent={cart.cartItems.length}
                       >
-                        Cart
+                        장바구니
                       </Badge>
                     ) : (
-                      'Cart'
+                      '장바구니'
                     )}
                   </Typography>
                 </Link>
@@ -298,14 +307,14 @@ export default function Layout({ title, description, children }) {
                     <MenuItem
                       onClick={(e) => loginMenuCloseHandler(e, '/profile')}
                     >
-                      Profile
+                      프로필
                     </MenuItem>
                     <MenuItem
                       onClick={(e) =>
                         loginMenuCloseHandler(e, '/order-history')
                       }
                     >
-                      Order Hisotry
+                      주문내역
                     </MenuItem>
                     {userInfo.isAdmin && (
                       <MenuItem
@@ -313,16 +322,16 @@ export default function Layout({ title, description, children }) {
                           loginMenuCloseHandler(e, '/admin/dashboard')
                         }
                       >
-                        Admin Dashboard
+                        관리자페지
                       </MenuItem>
                     )}
-                    <MenuItem onClick={logoutClickHandler}>Logout</MenuItem>
+                    <MenuItem onClick={logoutClickHandler}>로그아웃</MenuItem>
                   </Menu>
                 </>
               ) : (
                 <NextLink href="/login" passHref>
                   <Link>
-                    <Typography component="span">Login</Typography>
+                    <Typography component="span">로그인</Typography>
                   </Link>
                 </NextLink>
               )}
@@ -398,7 +407,11 @@ export default function Layout({ title, description, children }) {
             </Box>
           </Toolbar>
         </AppBar>
-        <Container className={classes.main}>{children}</Container>
+        {(isAdminPage && (
+          <Container className={classes.main} maxWidth={'1980px'}>
+            {children}
+          </Container>
+        )) || <Container className={classes.main}>{children}</Container>}
         <footer className={classes.footer}>
           <Typography>All rights reserved. 네이버 중고장터.</Typography>
         </footer>

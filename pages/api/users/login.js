@@ -8,7 +8,8 @@ const handler = nc();
 
 handler.post(async (req, res) => {
   await db.connect();
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ userid: req.body.userid });
+
   /*
   const clientIp =
     (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
@@ -21,13 +22,13 @@ handler.post(async (req, res) => {
     res.send({
       token,
       _id: user._id,
+      userid: user.userid,
       name: user.name,
       email: user.email,
-      //clientIp: clientIp,
       isAdmin: user.isAdmin,
     });
   } else {
-    res.status(401).send({ message: 'Invalid email or password' });
+    res.status(401).send({ message: '아이디와 암호가 일치하지 않습니다.' });
   }
 });
 

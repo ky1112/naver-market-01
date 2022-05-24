@@ -77,6 +77,7 @@ function reducer(state, action) {
       return { ...state, cart: { ...state.cart, cartItems: [] } };
     case 'USER_LOGIN':
       return { ...state, userInfo: action.payload };
+    //case 'FETCH_FAIL_TOKEN_EXPIRED':
     case 'USER_LOGOUT':
       return {
         ...state,

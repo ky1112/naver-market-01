@@ -36,7 +36,13 @@ export default function Register() {
   }, []);
 
   const classes = useStyles();
-  const submitHandler = async ({ name, email, password, confirmPassword }) => {
+  const submitHandler = async ({
+    userid,
+    name,
+    email,
+    password,
+    confirmPassword,
+  }) => {
     closeSnackbar();
     if (password !== confirmPassword) {
       enqueueSnackbar("Passwords don't match", { variant: 'error' });
@@ -44,6 +50,7 @@ export default function Register() {
     }
     try {
       const { data } = await axios.post('/api/users/register', {
+        userid,
         name,
         email,
         password,
@@ -56,12 +63,42 @@ export default function Register() {
     }
   };
   return (
-    <Layout title="Register">
+    <Layout title="가입">
       <form onSubmit={handleSubmit(submitHandler)} className={classes.form}>
         <Typography component="h1" variant="h1">
           Register
         </Typography>
         <List>
+          <ListItem>
+            <Controller
+              name="userid"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: true,
+                minLength: 2,
+              }}
+              render={({ field }) => (
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  id="userid"
+                  label="아이디"
+                  inputProps={{ type: 'userid' }}
+                  error={Boolean(errors.name)}
+                  helperText={
+                    errors.name
+                      ? errors.name.type === 'minLength'
+                        ? '아이디는 반드시 2글자이상이여야 합니다.'
+                        : '아이디를 입력하세요'
+                      : ''
+                  }
+                  {...field}
+                ></TextField>
+              )}
+            ></Controller>
+          </ListItem>
+
           <ListItem>
             <Controller
               name="name"

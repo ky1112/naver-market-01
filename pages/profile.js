@@ -30,6 +30,7 @@ function Profile() {
     formState: { errors },
     setValue,
   } = useForm();
+
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const router = useRouter();
   const classes = useStyles();
@@ -39,10 +40,12 @@ function Profile() {
     if (!userInfo) {
       return router.push('/login');
     }
+    setValue('userid', userInfo.userid);
     setValue('name', userInfo.name);
     setValue('email', userInfo.email);
 
     updateCurrentAction({
+      userid: userInfo.userid,
       token: userInfo.token,
       useremail: userInfo.email,
       accessUrl: 'profile page2',
@@ -108,6 +111,19 @@ function Profile() {
                 >
                   <List>
                     <ListItem>
+                      <TextField
+                        variant="outlined"
+                        fullWidth
+                        id="userid"
+                        label="아이디"
+                        inputProps={{ type: 'userid' }}
+                        error={Boolean(errors.userid)}
+                        value={userInfo.userid}
+                        disabled={true}
+                      ></TextField>
+                    </ListItem>
+
+                    <ListItem>
                       <Controller
                         name="name"
                         control={control}
@@ -136,6 +152,7 @@ function Profile() {
                         )}
                       ></Controller>
                     </ListItem>
+
                     <ListItem>
                       <Controller
                         name="email"

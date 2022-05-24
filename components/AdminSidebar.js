@@ -6,7 +6,7 @@ import useStyles from '../utils/styles';
 export default function AdminSideBar({ activeSelect }) {
   const classes = useStyles();
   return (
-    <Grid item md={3} xs={12}>
+    <Grid item md={1} xs={12}>
       <Card className={classes.section}>
         <List>
           <NextLink href="/admin/dashboard" passHref>
@@ -24,11 +24,11 @@ export default function AdminSideBar({ activeSelect }) {
           <NextLink href="/admin/category" passHref>
             {activeSelect == 'category' ? (
               <ListItem selected button component="a">
-                <ListItemText primary="카테고리"></ListItemText>
+                <ListItemText primary="카테고리관리"></ListItemText>
               </ListItem>
             ) : (
               <ListItem button component="a">
-                <ListItemText primary="카테고리"></ListItemText>
+                <ListItemText primary="카테고리관리"></ListItemText>
               </ListItem>
             )}
           </NextLink>
@@ -36,11 +36,11 @@ export default function AdminSideBar({ activeSelect }) {
           <NextLink href="/admin/orders" passHref>
             {activeSelect == 'order' ? (
               <ListItem selected button component="a">
-                <ListItemText primary="주문리스트"></ListItemText>
+                <ListItemText primary="주문내역관리"></ListItemText>
               </ListItem>
             ) : (
               <ListItem button component="a">
-                <ListItemText primary="주문리스트"></ListItemText>
+                <ListItemText primary="주문내역관리"></ListItemText>
               </ListItem>
             )}
           </NextLink>
@@ -48,11 +48,23 @@ export default function AdminSideBar({ activeSelect }) {
           <NextLink href="/admin/products" passHref>
             {activeSelect == 'product' ? (
               <ListItem selected button component="a">
-                <ListItemText primary="상품"></ListItemText>
+                <ListItemText primary="상품관리"></ListItemText>
               </ListItem>
             ) : (
               <ListItem button component="a">
-                <ListItemText primary="상품"></ListItemText>
+                <ListItemText primary="상품관리"></ListItemText>
+              </ListItem>
+            )}
+          </NextLink>
+
+          <NextLink href="/admin/advertise" passHref>
+            {activeSelect == 'advertise' ? (
+              <ListItem selected button component="a">
+                <ListItemText primary="광고관리"></ListItemText>
+              </ListItem>
+            ) : (
+              <ListItem button component="a">
+                <ListItemText primary="광고관리"></ListItemText>
               </ListItem>
             )}
           </NextLink>
