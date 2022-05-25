@@ -82,7 +82,7 @@ export default function Shipping() {
       <CheckoutWizard activeStep={1} />
       <form onSubmit={handleSubmit(submitHandler)} className={classes.form}>
         <Typography component="h1" variant="h1">
-          Shipping Address
+          배송주소
         </Typography>
         <List>
           <ListItem>

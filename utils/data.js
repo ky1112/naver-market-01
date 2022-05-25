@@ -16,6 +16,15 @@ const data = {
     },
   ],
 */
+  advertise: [
+    {
+      user: 'admin',
+      advertiseName: '광고1',
+      linkUrl: 'https://www.bing.com/',
+      imagePath: '/images/advertise1.jpg',
+    },
+  ],
+
   category: [
     {
       name: 'Shirts',

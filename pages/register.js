@@ -66,7 +66,7 @@ export default function Register() {
     <Layout title="가입">
       <form onSubmit={handleSubmit(submitHandler)} className={classes.form}>
         <Typography component="h1" variant="h1">
-          Register
+          회원가입
         </Typography>
         <List>
           <ListItem>
@@ -217,11 +217,11 @@ export default function Register() {
           </ListItem>
           <ListItem>
             <Button variant="contained" type="submit" fullWidth color="primary">
-              Register
+              회원가입
             </Button>
           </ListItem>
           <ListItem>
-            Already have an account? &nbsp;
+            회원이신가요? &nbsp;
             <NextLink href={`/login?redirect=${redirect || '/'}`} passHref>
               <Link>Login</Link>
             </NextLink>

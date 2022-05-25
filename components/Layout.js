@@ -39,15 +39,8 @@ import axios from 'axios';
 import { useEffect } from 'react';
 
 import Grid from '@material-ui/core/Grid';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Grow from '@material-ui/core/Grow';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
-import MenuList from '@material-ui/core/MenuList';
-
 import { updateCurrentAction } from '../utils/common';
+import Category from './Category';
 
 export default function Layout({ title, description, children, isAdminPage }) {
   const router = useRouter();
@@ -150,34 +143,6 @@ export default function Layout({ title, description, children, isAdminPage }) {
     Cookies.remove('shippinhAddress');
     Cookies.remove('paymentMethod');
     router.push('/');
-  };
-
-  //Category Button Part
-  const options = ['카테고리 1', '카테고리 2', '카테고리 3'];
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
-
-  const handleClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`);
-  };
-
-  const handleMenuItemClick = (event, index) => {
-    console.log(options[index]);
-    setSelectedIndex(index);
-    setOpen(false);
-  };
-
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
-
-  const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
-      return;
-    }
-
-    setOpen(false);
   };
 
   return (
@@ -338,75 +303,21 @@ export default function Layout({ title, description, children, isAdminPage }) {
             </div>
           </Toolbar>
         </AppBar>
+
         <AppBar position="static" className={classes.navbar}>
           <Toolbar className={classes.toolbar}>
             <Box display="flex" alignItems="center">
               <div>
                 <Grid container direction="column" alignItems="center">
                   <Grid item xs={12}>
-                    <ButtonGroup
-                      variant="contained"
-                      color="primary"
-                      ref={anchorRef}
-                      aria-label="split button"
-                    >
-                      <Button onClick={handleClick}>카테고리</Button>
-                      <Button
-                        color="primary"
-                        size="small"
-                        aria-controls={open ? 'split-button-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-label="select merge strategy"
-                        aria-haspopup="menu"
-                        onClick={handleToggle}
-                      >
-                        <ArrowDropDownIcon />
-                      </Button>
-                    </ButtonGroup>
-                    <Popper
-                      open={open}
-                      anchorEl={anchorRef.current}
-                      role={undefined}
-                      transition
-                      disablePortal
-                    >
-                      {({ TransitionProps, placement }) => (
-                        <Grow
-                          {...TransitionProps}
-                          style={{
-                            transformOrigin:
-                              placement === 'bottom'
-                                ? 'center top'
-                                : 'center bottom',
-                          }}
-                        >
-                          <Paper>
-                            <ClickAwayListener onClickAway={handleClose}>
-                              <MenuList id="split-button-menu">
-                                {options.map((option, index) => (
-                                  <MenuItem
-                                    key={option}
-                                    disabled={index === 2}
-                                    selected={index === selectedIndex}
-                                    onClick={(event) =>
-                                      handleMenuItemClick(event, index)
-                                    }
-                                  >
-                                    {option}
-                                  </MenuItem>
-                                ))}
-                              </MenuList>
-                            </ClickAwayListener>
-                          </Paper>
-                        </Grow>
-                      )}
-                    </Popper>
+                    <Category />
                   </Grid>
                 </Grid>
               </div>
             </Box>
           </Toolbar>
         </AppBar>
+
         {(isAdminPage && (
           <Container className={classes.main} maxWidth={'1980px'}>
             {children}

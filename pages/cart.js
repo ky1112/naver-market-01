@@ -47,7 +47,7 @@ function CartScreen() {
   return (
     <Layout title="Shopping Cart">
       <Typography component="h1" variant="h1">
-        Shopping Cart
+        쇼핑카트
       </Typography>
       {cartItems.length === 0 ? (
         <div>
@@ -63,11 +63,11 @@ function CartScreen() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Image</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell align="right">Quantity</TableCell>
-                    <TableCell align="right">Price</TableCell>
-                    <TableCell align="right">Action</TableCell>
+                    <TableCell>상품이미지</TableCell>
+                    <TableCell>상품이름</TableCell>
+                    <TableCell align="right">수량</TableCell>
+                    <TableCell align="right">가격</TableCell>
+                    <TableCell align="right"></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -114,7 +114,7 @@ function CartScreen() {
                           color="secondary"
                           onClick={() => removeItemHandler(item)}
                         >
-                          x
+                          삭제
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -128,9 +128,8 @@ function CartScreen() {
               <List>
                 <ListItem>
                   <Typography variant="h2">
-                    Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}
-                    items) : $
-                    {cartItems.reduce((a, c) => a + c.quantity * c.price, 0)}
+                    총계 ({cartItems.reduce((a, c) => a + c.quantity, 0)} 개) :
+                    ${cartItems.reduce((a, c) => a + c.quantity * c.price, 0)}
                   </Typography>
                 </ListItem>
                 <ListItem>
@@ -140,7 +139,7 @@ function CartScreen() {
                     color="primary"
                     fullWidth
                   >
-                    Check Out
+                    체크아웃
                   </Button>
                 </ListItem>
               </List>

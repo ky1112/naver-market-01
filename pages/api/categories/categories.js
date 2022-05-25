@@ -15,7 +15,8 @@ handler.get(async (req, res) => {
 
 handler.get(async (req, res) => {
   await db.connect();
-  const categories = await Category.find({}).distinct('name');
+  //const categories = await Category.find({}).distinct('name');
+  const categories = await Category.find({});
   await db.disconnect();
   res.send(categories);
 });

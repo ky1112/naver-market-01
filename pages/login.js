@@ -66,7 +66,7 @@ export default function Login() {
     <Layout title="Login">
       <form onSubmit={handleSubmit(submitHandler)} className={classes.form}>
         <Typography component="h1" variant="h1">
-          Login
+          로그인
         </Typography>
         <List>
           <ListItem>
@@ -130,13 +130,13 @@ export default function Login() {
           </ListItem>
           <ListItem>
             <Button variant="contained" type="submit" fullWidth color="primary">
-              Login
+              로그인
             </Button>
           </ListItem>
           <ListItem>
-            Don&apos;t have an account? &nbsp;
+            아직 가입하지 않으셨다면 &nbsp;
             <NextLink href={`/register?redirect=${redirect || '/'}`} passHref>
-              <Link>Register</Link>
+              <Link>회원가입</Link>
             </NextLink>
           </ListItem>
         </List>
