@@ -18,6 +18,12 @@ const initialState = {
   userInfo: Cookies.get('userInfo')
     ? JSON.parse(Cookies.get('userInfo'))
     : null,
+  naverUserInfo: Cookies.get('naverUserInfo')
+    ? JSON.parse(Cookies.get('naverUserInfo'))
+    : null,
+  naverDeliverInfo: Cookies.get('naverDeliverInfo')
+    ? JSON.parse(Cookies.get('naverDeliverInfo'))
+    : null,
 };
 
 function reducer(state, action) {
@@ -88,7 +94,10 @@ function reducer(state, action) {
           paymentMethod: '',
         },
       };
-
+    case 'NAVER_USER_LOGIN':
+      return { ...state, naverUserInfo: action.payload };
+    case 'NAVER_DELIVER_INFO_CONFIRM':
+      return { ...state, naverDeliverInfo: action.payload };
     default:
       return state;
   }

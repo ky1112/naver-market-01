@@ -27,7 +27,7 @@ const useTreeItemStyles = makeStyles((theme) => ({
       backgroundColor: theme.palette.action.hover,
     },
     '&:focus > $content, &$selected > $content': {
-      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.grey[400]})`,
+      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.grey[100]})`,
       color: 'var(--tree-view-color)',
     },
     '&:focus > $content $label, &:hover > $content $label, &$selected > $content $label':
@@ -130,7 +130,7 @@ const useStyles = makeStyles({
 
 export default function CategoryBody(props) {
   const classes = useStyles();
-  const { handleCloseCategoryBody } = props;
+  const { handleClickCategorySearch } = props;
   const [categories, setCategories] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -141,6 +141,12 @@ export default function CategoryBody(props) {
     } catch (err) {
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
+  };
+
+  const handleClickItem = (searchType, searchId) => {
+    console.log(searchType);
+    console.log(searchId);
+    handleClickCategorySearch(searchType);
   };
 
   useEffect(() => {
@@ -157,14 +163,14 @@ export default function CategoryBody(props) {
     >
       {categories.map((category) => (
         <>
-          <StyledTreeItem
-            key={category._id}
-            nodeId={category._id}
-            labelText={category.name}
-            labelIcon={MailIcon}
-          >
-            {category.tags.length > 1 &&
-              category.tags.map((tag) => (
+          {category.tags.length >= 1 ? (
+            <StyledTreeItem
+              key={category._id}
+              nodeId={category._id}
+              labelText={category.name}
+              labelIcon={MailIcon}
+            >
+              {category.tags.map((tag) => (
                 <StyledTreeItem
                   key={tag._id}
                   nodeId={tag._id}
@@ -173,10 +179,19 @@ export default function CategoryBody(props) {
                   labelInfo=""
                   color="#1a73e8"
                   bgColor="#e8f0fe"
-                  onClick={handleCloseCategoryBody}
+                  onClick={() => handleClickItem('tag', tag._id)}
                 />
               ))}
-          </StyledTreeItem>
+            </StyledTreeItem>
+          ) : (
+            <StyledTreeItem
+              key={category._id}
+              nodeId={category._id}
+              labelText={category.name}
+              labelIcon={MailIcon}
+              onClick={() => handleClickItem('category', category._id)}
+            />
+          )}
         </>
       ))}
     </TreeView>

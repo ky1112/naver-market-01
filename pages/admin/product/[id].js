@@ -2,6 +2,8 @@ import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect, useContext, useReducer, useState } from 'react';
+import Carousel from 'react-material-ui-carousel';
+import Image from 'next/image';
 
 import {
   Grid,
@@ -35,7 +37,9 @@ function reducer(state, action) {
         ...state,
         loading: false,
         error: '',
-        categories: action.payload,
+        categories: action.payload.categories,
+        tags: action.payload.tags,
+        imageData: action.payload.images,
       };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
@@ -52,10 +56,17 @@ function reducer(state, action) {
         ...state,
         loadingUpload: false,
         errorUpload: '',
+        imageData: action.payload,
       };
     case 'UPLOAD_FAIL':
       return { ...state, loadingUpload: false, errorUpload: action.payload };
 
+    case 'FETCH_TAGS_BY_CATEGORY_REQUEST':
+      return { ...state, loading: true, error: '' };
+    case 'FETCH_TAGS_BY_CATEGORY_SUCCESS':
+      return { ...state, loading: false, error: '', tags: action.payload };
+    case 'FETCH_TAGS_BY_CATEGORY_FAIL':
+      return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
@@ -65,12 +76,22 @@ function ProductEdit({ params }) {
   const productId = params.id;
   const { state, dispatch } = useContext(Store);
   const [
-    { loading, error, loadingUpdate, loadingUpload, categories },
+    {
+      loading,
+      error,
+      loadingUpdate,
+      loadingUpload,
+      categories,
+      tags,
+      imageData,
+    },
     dispatch_local,
   ] = useReducer(reducer, {
     loading: true,
     error: '',
     categories: [],
+    tags: [],
+    imageData: [],
   });
 
   const {
@@ -96,10 +117,21 @@ function ProductEdit({ params }) {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
 
-      dispatch_local({ type: 'FETCH_SUCCESS', payload: res.data });
+      const res_tag = await axios.get(
+        `/api/admin/categories/get_tag_info_by_catname?name=${data.category}`,
+        {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        }
+      );
 
+      const ultres = {
+        categories: res.data,
+        tags: res_tag.data.tags,
+        images: data.image,
+      };
+
+      dispatch_local({ type: 'FETCH_SUCCESS', payload: ultres });
       //categories.current = res.data;
-      //console.log(categories);
 
       setValue('name', data.name);
       setValue('slug', data.slug);
@@ -108,6 +140,7 @@ function ProductEdit({ params }) {
       setValue('featuredImage', data.featuredImage);
       setIsFeatured(data.isFeatured);
       setValue('category', data.category);
+      setValue('subcategory', data.tagName);
       setValue('brand', data.brand);
       setValue('countInStock', data.countInStock);
       setValue('description', data.description);
@@ -123,7 +156,42 @@ function ProductEdit({ params }) {
     }
   };
 
+  const fetchTags = async (category_id) => {
+    try {
+      dispatch_local({ type: 'FETCH_TAGS_BY_CATEGORY_REQUEST' });
+      const { data } = await axios.get(
+        `/api/admin/categories/get_tag_info_by_catid?id=${category_id}`,
+        {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+      console.log({ data });
+      dispatch_local({
+        type: 'FETCH_TAGS_BY_CATEGORY_SUCCESS',
+        payload: data.tags,
+      });
+    } catch (err) {
+      if (getError(err) == 'Token is not valid') {
+        clearCookies();
+        await dispatch({
+          type: 'USER_LOGOUT',
+        });
+        router.push(`/login?redirect=/admin/product/${productId}`);
+      } else
+        dispatch_local({
+          type: 'FETCH_TAGS_BY_CATEGORY_FAIL',
+          payload: getError(err),
+        });
+    }
+  };
+
   useEffect(() => {
+    // console.log({
+    //   handleSubmit,
+    //   control,
+    //   formState: { errors },
+    //   setValue,
+    // });
     if (!userInfo) {
       return router.push('/login');
     } else {
@@ -132,24 +200,31 @@ function ProductEdit({ params }) {
   }, []);
 
   const uploadHandler = async (e, imageField = 'image') => {
-    const file = e.target.files[0];
-    const bodyFormData = new FormData();
-    bodyFormData.append('file', file);
-    try {
-      dispatch_local({ type: 'UPLOAD_REQUEST' });
-      const { data } = await axios.post('/api/admin/upload', bodyFormData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          authorization: `Bearer ${userInfo.token}`,
-        },
-      });
-      dispatch_local({ type: 'UPLOAD_SUCCESS' });
-      setValue(imageField, data.secure_url);
-      enqueueSnackbar('File uploaded successfully', { variant: 'success' });
-    } catch (err) {
-      dispatch_local({ type: 'UPLOAD_FAIL', payload: getError(err) });
-      enqueueSnackbar(getError(err), { variant: 'error' });
+    const files = e.target.files;
+    //console.log(files);
+    let imageList = [];
+    for (var i = 0; i < files.length; i++) {
+      const bodyFormData = new FormData();
+      bodyFormData.append('file', files[i]);
+      try {
+        dispatch_local({ type: 'UPLOAD_REQUEST' });
+        const { data } = await axios.post('/api/admin/upload', bodyFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+        //dispatch_local({ type: 'UPLOAD_SUCCESS' });
+        setValue(imageField, data.secure_url);
+        imageList.push({ imagePath: data.secure_url });
+        enqueueSnackbar('File uploaded successfully', { variant: 'success' });
+      } catch (err) {
+        dispatch_local({ type: 'UPLOAD_FAIL', payload: getError(err) });
+        enqueueSnackbar(getError(err), { variant: 'error' });
+      }
     }
+    dispatch_local({ type: 'UPLOAD_SUCCESS', payload: imageList });
+    //console.log(imageList);
   };
 
   const submitHandler = async ({
@@ -157,6 +232,7 @@ function ProductEdit({ params }) {
     slug,
     price,
     category,
+    subcategory,
     image,
     featuredImage,
     brand,
@@ -173,7 +249,8 @@ function ProductEdit({ params }) {
           slug,
           price,
           category,
-          image,
+          tagName: subcategory,
+          image: imageData,
           isFeatured,
           featuredImage,
           brand,
@@ -189,6 +266,11 @@ function ProductEdit({ params }) {
       dispatch_local({ type: 'UPDATE_FAIL', payload: getError(err) });
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
+  };
+
+  const handleChangeCategory = async (category_id) => {
+    console.log(category_id);
+    await fetchTags(category_id);
   };
 
   const [isFeatured, setIsFeatured] = useState(false);
@@ -230,9 +312,11 @@ function ProductEdit({ params }) {
                             variant="outlined"
                             fullWidth
                             id="name"
-                            label="Name"
+                            label="상품이름"
                             error={Boolean(errors.name)}
-                            helperText={errors.name ? 'Name is required' : ''}
+                            helperText={
+                              errors.name ? '상품이름이 필요합니다' : ''
+                            }
                             {...field}
                           ></TextField>
                         )}
@@ -251,7 +335,7 @@ function ProductEdit({ params }) {
                             variant="outlined"
                             fullWidth
                             id="slug"
-                            label="Slug"
+                            label="상품식별자"
                             error={Boolean(errors.slug)}
                             helperText={errors.slug ? 'Slug is required' : ''}
                             {...field}
@@ -272,15 +356,16 @@ function ProductEdit({ params }) {
                             variant="outlined"
                             fullWidth
                             id="price"
-                            label="Price"
+                            label="상품가격"
                             error={Boolean(errors.price)}
-                            helperText={errors.price ? 'Price is required' : ''}
+                            helperText={errors.price ? '가격을 입력하세요' : ''}
                             {...field}
                           ></TextField>
                         )}
                       ></Controller>
                     </ListItem>
-                    <ListItem>
+
+                    {/* <ListItem>
                       <Controller
                         name="image"
                         control={control}
@@ -300,19 +385,39 @@ function ProductEdit({ params }) {
                           ></TextField>
                         )}
                       ></Controller>
+                    </ListItem> */}
+
+                    <ListItem>
+                      <Carousel className={classes.mt1} animation="slide">
+                        {imageData.map((ig) => (
+                          // <img src={ig.imagePath} alt={1}></img>
+                          <Image
+                            key={ig._id}
+                            src={ig.imagePath}
+                            alt={''}
+                            width={'400px'}
+                            height={'400px'}
+                          ></Image>
+                        ))}
+                      </Carousel>
                     </ListItem>
 
                     <ListItem>
                       <Button variant="contained" component="label">
-                        이미지파일 업로드
-                        <input type="file" onChange={uploadHandler} hidden />
+                        상품이미지파일 업로드
+                        <input
+                          type="file"
+                          onChange={uploadHandler}
+                          hidden
+                          multiple
+                        />
                       </Button>
                       {loadingUpload && <CircularProgress />}
                     </ListItem>
 
                     <ListItem>
                       <FormControlLabel
-                        label="Is Featured"
+                        label="특정상품인가요?"
                         control={
                           <Checkbox
                             onClick={(e) => setIsFeatured(e.target.checked)}
@@ -322,7 +427,7 @@ function ProductEdit({ params }) {
                         }
                       ></FormControlLabel>
                     </ListItem>
-                    <ListItem>
+                    {/* <ListItem>
                       <Controller
                         name="featuredImage"
                         control={control}
@@ -356,7 +461,7 @@ function ProductEdit({ params }) {
                         />
                       </Button>
                       {loadingUpload && <CircularProgress />}
-                    </ListItem>
+                    </ListItem> */}
 
                     {/* <ListItem>
                       <Controller
@@ -396,15 +501,51 @@ function ProductEdit({ params }) {
                             variant="outlined"
                             fullWidth
                             select
-                            label="Categories"
+                            label="카테고리"
                             helperText={
                               errors.category ? 'Category is required' : ''
                             }
                             {...field}
                           >
                             {categories.map((option) => (
-                              <MenuItem key={option._id} value={option.name}>
+                              <MenuItem
+                                key={option._id}
+                                value={option.name}
+                                onClick={() => handleChangeCategory(option._id)}
+                              >
                                 {option.name}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        )}
+                      ></Controller>
+                    </ListItem>
+
+                    <ListItem>
+                      <Controller
+                        name="subcategory"
+                        control={control}
+                        defaultValue=""
+                        rules={{
+                          required: false,
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            id="subcategory"
+                            variant="outlined"
+                            fullWidth
+                            select
+                            label="서브카테고리"
+                            helperText={
+                              errors.subcategory
+                                ? '서브카테고리를 선택하세요'
+                                : ''
+                            }
+                            {...field}
+                          >
+                            {tags.map((option) => (
+                              <MenuItem key={option._id} value={option.tagName}>
+                                {option.tagName}
                               </MenuItem>
                             ))}
                           </TextField>

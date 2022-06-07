@@ -93,7 +93,7 @@ function AdminDashboard() {
                       <Card raised>
                         <CardContent>
                           <Typography variant="h1">
-                            ${summary.ordersPrice}
+                            {summary.ordersPrice}원
                           </Typography>
                           <Typography>총판매금액</Typography>
                         </CardContent>

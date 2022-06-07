@@ -1,6 +1,7 @@
 import nc from 'next-connect';
 import { isAdmin, isAuth } from '../../../../utils/auth';
 import Product from '../../../../models/Product';
+import Category from '../../../../models/Category';
 import db from '../../../../utils/db';
 
 const handler = nc();
@@ -15,12 +16,21 @@ handler.get(async (req, res) => {
 
 handler.post(async (req, res) => {
   await db.connect();
+  //const category = await Category.find().sort({ _id: -1 }).limit(1);
+  //const category = await Category.findById('62743d9e6ef7bd6a60aa36c9');
+  const category = await Category.findOne({});
+  let tag = '';
+  if (category.tags.length > 0) {
+    tag = category.tags[0].tagName;
+  }
+
   const newProduct = new Product({
     name: 'sample name',
     slug: 'sample-slug-' + Math.random(),
-    image: '/images/shirt1.jpg',
+    image: [{ imagePath: '/images/shirt1.jpg' }],
     price: 0,
-    category: 'sample category',
+    category: category.name,
+    tagName: tag,
     brand: 'sample brand',
     countInStock: 0,
     description: 'sample description',

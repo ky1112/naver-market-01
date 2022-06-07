@@ -12,13 +12,23 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+const imageSchema = new mongoose.Schema(
+  {
+    imagePath: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     category: { type: String, required: true },
     tagName: { type: String, required: false },
-    image: { type: String, required: true },
+    //image: { type: String, required: true },
+    image: [imageSchema],
     price: { type: Number, required: true },
     brand: { type: String, required: true },
     rating: { type: Number, required: true, default: 0 },

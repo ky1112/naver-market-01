@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import Image from 'next/image';
+import Carousel from 'react-material-ui-carousel';
 import {
   Grid,
   Link,
@@ -98,13 +99,26 @@ export default function ProductScreen(props) {
       </div>
       <Grid container spacing={1}>
         <Grid item md={6} xs={12}>
-          <Image
+          {/* <Image
             src={product.image}
             alt={product.name}
             width={640}
             height={640}
             layout="responsive"
-          ></Image>
+          ></Image> */}
+          <Carousel className={classes.mt1} animation="slide">
+            {JSON.parse(product.image).map((ig) => (
+              // <img src={ig.imagePath} alt={1}></img>
+              <Image
+                key={ig._id}
+                src={ig.imagePath}
+                alt={''}
+                width={'640'}
+                height={'640'}
+                layout="responsive"
+              ></Image>
+            ))}
+          </Carousel>
         </Grid>
         <Grid item md={3} xs={12}>
           <List>
@@ -114,19 +128,19 @@ export default function ProductScreen(props) {
               </Typography>
             </ListItem>
             <ListItem>
-              <Typography>Category: {product.category}</Typography>
+              <Typography>카테고리: {product.category}</Typography>
             </ListItem>
             <ListItem>
-              <Typography>Brand: {product.brand}</Typography>
+              <Typography>브랜드: {product.brand}</Typography>
             </ListItem>
             <ListItem>
               <Rating value={product.rating} readOnly></Rating>
               <Link href="#reviews">
-                <Typography>({product.numReviews} reviews)</Typography>
+                <Typography>({product.numReviews} 개의 리뷰가 있음)</Typography>
               </Link>
             </ListItem>
             <ListItem>
-              <Typography> Description: {product.description}</Typography>
+              <Typography> 상세: {product.description}</Typography>
             </ListItem>
           </List>
         </Grid>
@@ -136,7 +150,7 @@ export default function ProductScreen(props) {
               <ListItem>
                 <Grid container>
                   <Grid item xs={6}>
-                    <Typography>Price</Typography>
+                    <Typography>가격</Typography>
                   </Grid>
                   <Grid item xs={6}>
                     <Typography>${product.price}</Typography>
@@ -146,11 +160,11 @@ export default function ProductScreen(props) {
               <ListItem>
                 <Grid container>
                   <Grid item xs={6}>
-                    <Typography>Status</Typography>
+                    <Typography>재고상태</Typography>
                   </Grid>
                   <Grid item xs={6}>
                     <Typography>
-                      {product.countInStock > 0 ? 'In stock' : 'Unavailable'}
+                      {product.countInStock > 0 ? '재고있음' : '재고없음'}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -162,7 +176,7 @@ export default function ProductScreen(props) {
                   color="primary"
                   onClick={addToCartHandler}
                 >
-                  Add to cart
+                  카트에 추가
                 </Button>
               </ListItem>
             </List>
@@ -172,10 +186,10 @@ export default function ProductScreen(props) {
       <List>
         <ListItem>
           <Typography name="reviews" id="reviews" variant="h2">
-            Customer Reviews
+            상품평
           </Typography>
         </ListItem>
-        {reviews.length === 0 && <ListItem>No review</ListItem>}
+        {reviews.length === 0 && <ListItem>아직 상품평이 없습니다.</ListItem>}
         {reviews.map((review) => (
           <ListItem key={review._id}>
             <Grid container>
@@ -197,7 +211,7 @@ export default function ProductScreen(props) {
             <form onSubmit={submitHandler} className={classes.reviewForm}>
               <List>
                 <ListItem>
-                  <Typography variant="h2">Leave your review</Typography>
+                  <Typography variant="h2">상품리뷰</Typography>
                 </ListItem>
                 <ListItem>
                   <TextField
@@ -205,7 +219,7 @@ export default function ProductScreen(props) {
                     variant="outlined"
                     fullWidth
                     name="review"
-                    label="Enter comment"
+                    label="리뷰를 남겨보세요"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                   />
@@ -224,7 +238,7 @@ export default function ProductScreen(props) {
                     variant="contained"
                     color="primary"
                   >
-                    Submit
+                    리뷰하기
                   </Button>
 
                   {loading && <CircularProgress></CircularProgress>}
@@ -255,7 +269,7 @@ export async function getServerSideProps(context) {
   await db.disconnect();
   return {
     props: {
-      product: db.convertDocToObj(product),
+      product: db.convertDocToObj4Product(product),
     },
   };
 }

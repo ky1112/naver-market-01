@@ -35,7 +35,7 @@ export default function Category() {
     setAnchorEl(null);
   };
 
-  const handleCloseCategoryBody = () => {
+  const handleClickCategorySearch = (e) => {
     setAnchorEl(null);
   };
 
@@ -57,7 +57,7 @@ export default function Category() {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <CategoryBody handleCloseCategoryBody={handleCloseCategoryBody} />
+        <CategoryBody handleClickCategorySearch={handleClickCategorySearch} />
       </StyledMenu>
     </div>
   );

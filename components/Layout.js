@@ -198,8 +198,8 @@ export default function Layout({ title, description, children, isAdminPage }) {
                 <Divider light />
                 {categories.map((category) => (
                   <NextLink
-                    key={category}
-                    href={`/search?category=${category}`}
+                    key={category._id}
+                    href={`/search?category=${category.name}`}
                     passHref
                   >
                     <ListItem
@@ -207,7 +207,7 @@ export default function Layout({ title, description, children, isAdminPage }) {
                       component="a"
                       onClick={sidebarCloseHandler}
                     >
-                      <ListItemText primary={category}></ListItemText>
+                      <ListItemText primary={category.name}></ListItemText>
                     </ListItem>
                   </NextLink>
                 ))}

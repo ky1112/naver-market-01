@@ -42,5 +42,15 @@ function convertDocToObj(doc) {
   return doc;
 }
 
-const db = { connect, disconnect, convertDocToObj };
+function convertDocToObj4Product(doc) {
+  doc._id = doc._id.toString();
+  doc.createdAt = doc.createdAt.toString();
+  doc.updatedAt = doc.updatedAt.toString();
+  //doc.image = doc.image[0].imagePath;
+  doc.image = JSON.stringify(doc.image);
+
+  return doc;
+}
+
+const db = { connect, disconnect, convertDocToObj, convertDocToObj4Product };
 export default db;

@@ -4,6 +4,7 @@ import {
   Grid,
   List,
   ListItem,
+  Menu,
   MenuItem,
   Select,
   Typography,
@@ -20,6 +21,9 @@ import { Store } from '../utils/Store';
 import axios from 'axios';
 import Rating from '@material-ui/lab/Rating';
 import { Pagination } from '@material-ui/lab';
+
+import { withStyles } from '@material-ui/core/styles';
+import CategoryBody from '../components/CategoryBody';
 
 const PAGE_SIZE = 3;
 
@@ -39,6 +43,26 @@ const prices = [
 ];
 
 const ratings = [1, 2, 3, 4, 5];
+
+const StyledMenu = withStyles({
+  paper: {
+    border: '1px solid #d3d4d5',
+  },
+})((props) => (
+  <Menu
+    elevation={0}
+    getContentAnchorEl={null}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+));
 
 export default function Search(props) {
   const classes = useStyles();
@@ -112,14 +136,24 @@ export default function Search(props) {
     dispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity } });
     router.push('/cart');
   };
+
   return (
     <Layout title="Search">
       <Grid className={classes.mt1} container spacing={1}>
         <Grid item md={3}>
           <List>
+            {/* <ListItem>
+              <Box className={classes.fullWidth}>
+                <Typography>카테고리</Typography>
+                <CategoryBody
+                  handleClickCategorySearch={handleClickCategorySearch}
+                />
+              </Box>
+            </ListItem> */}
+
             <ListItem>
               <Box className={classes.fullWidth}>
-                <Typography>Categories</Typography>
+                <Typography>카테고리</Typography>
                 <Select fullWidth value={category} onChange={categoryHandler}>
                   <MenuItem value="all">All</MenuItem>
                   {categories &&
@@ -308,8 +342,7 @@ export async function getServerSideProps({ query }) {
   });
   await db.disconnect();
 
-  const products = productDocs.map(db.convertDocToObj);
-
+  const products = productDocs.map(db.convertDocToObj4Product);
   return {
     props: {
       products,

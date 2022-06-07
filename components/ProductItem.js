@@ -7,18 +7,24 @@ import {
   CardMedia,
   Typography,
 } from '@material-ui/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import NextLink from 'next/link';
 import Rating from '@material-ui/lab/Rating';
 
 export default function ProductItem({ product, addToCartHandler }) {
+  useEffect(() => {
+    //console.log(1);
+    var a = JSON.parse(product.image);
+    console.log(a[0].imagePath);
+  });
+
   return (
     <Card>
       <NextLink href={`/product/${product.slug}`} passHref>
         <CardActionArea>
           <CardMedia
             component="img"
-            image={product.image}
+            image={JSON.parse(product.image)[0].imagePath}
             title={product.name}
           ></CardMedia>
           <CardContent>

@@ -177,6 +177,7 @@ function AdminProdcuts() {
                           <TableCell>상품명</TableCell>
                           <TableCell>가격</TableCell>
                           <TableCell>카테고리</TableCell>
+                          <TableCell>하위카테고리</TableCell>
                           <TableCell>수량</TableCell>
                           <TableCell>별점</TableCell>
                           <TableCell>기타</TableCell>
@@ -191,6 +192,7 @@ function AdminProdcuts() {
                             <TableCell>{product.name}</TableCell>
                             <TableCell>${product.price}</TableCell>
                             <TableCell>{product.category}</TableCell>
+                            <TableCell>{product.tagName}</TableCell>
                             <TableCell>{product.countInStock}</TableCell>
                             <TableCell>{product.rating}</TableCell>
                             <TableCell>
@@ -199,7 +201,7 @@ function AdminProdcuts() {
                                 passHref
                               >
                                 <Button size="small" variant="contained">
-                                  Edit
+                                  변경
                                 </Button>
                               </NextLink>{' '}
                               <Button
@@ -207,7 +209,7 @@ function AdminProdcuts() {
                                 size="small"
                                 variant="contained"
                               >
-                                Delete
+                                삭제
                               </Button>
                             </TableCell>
                           </TableRow>

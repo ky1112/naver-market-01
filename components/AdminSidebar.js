@@ -81,6 +81,18 @@ export default function AdminSideBar({ activeSelect }) {
             )}
           </NextLink>
 
+          <NextLink href="/admin/bankinfo" passHref>
+            {activeSelect == 'bankinfo' ? (
+              <ListItem selected button component="a">
+                <ListItemText primary="계좌정보관리"></ListItemText>
+              </ListItem>
+            ) : (
+              <ListItem button component="a">
+                <ListItemText primary="계좌정보관리"></ListItemText>
+              </ListItem>
+            )}
+          </NextLink>
+
           <NextLink href="/admin/users" passHref>
             {activeSelect == 'user' ? (
               <ListItem selected button component="a">

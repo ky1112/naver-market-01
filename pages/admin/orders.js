@@ -60,6 +60,7 @@ function AdminOrders() {
         const { data } = await axios.get(`/api/admin/orders`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
+
         dispatch_local({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
         if (getError(err) == 'Token is not valid') {
@@ -97,7 +98,7 @@ function AdminOrders() {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>ID</TableCell>
+                          <TableCell>주문번호</TableCell>
                           <TableCell>아이디</TableCell>
                           <TableCell>날짜</TableCell>
                           <TableCell>금액</TableCell>
@@ -109,9 +110,11 @@ function AdminOrders() {
                       <TableBody>
                         {orders.map((order) => (
                           <TableRow key={order._id}>
-                            <TableCell>{order._id.substring(20, 24)}</TableCell>
+                            {/* <TableCell>{order._id.substring(20, 24)}</TableCell> */}
+                            <TableCell>{order.orderNo}</TableCell>
                             <TableCell>
-                              {order.user ? order.user.name : 'DELETED USER'}
+                              {/* {order.user ? order.user.name : 'DELETED USER'} */}
+                              {order.user}
                             </TableCell>
                             <TableCell>{order.createdAt}</TableCell>
                             <TableCell>${order.totalPrice}</TableCell>
@@ -126,7 +129,13 @@ function AdminOrders() {
                                 : 'not delivered'}
                             </TableCell>
                             <TableCell>
-                              <NextLink href={`/order/${order._id}`} passHref>
+                              {/* <NextLink href={`/order/${order._id}`} passHref>
+                                <Button variant="contained">자세히보기</Button>
+                              </NextLink> */}
+                              <NextLink
+                                href={`/admin/order/${order._id}`}
+                                passHref
+                              >
                                 <Button variant="contained">자세히보기</Button>
                               </NextLink>
                             </TableCell>

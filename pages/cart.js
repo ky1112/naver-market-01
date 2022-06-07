@@ -33,7 +33,7 @@ function CartScreen() {
   const updateCartHandler = async (item, quantity) => {
     const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
-      window.alert('Sorry. Product is out of stock');
+      window.alert('상품의 재고수량이 부족합니다.');
       return;
     }
     dispatch({ type: 'CART_ADD_ITEM', payload: { ...item, quantity } });
@@ -42,8 +42,11 @@ function CartScreen() {
     dispatch({ type: 'CART_REMOVE_ITEM', payload: item });
   };
   const checkoutHandler = () => {
-    router.push('/shipping');
+    //router.push('/shipping');
+    router.push('/naver/confirm');
+    //router.push({ pathname: '/naver/confirm', query: { test: 1 } });
   };
+
   return (
     <Layout title="Shopping Cart">
       <Typography component="h1" variant="h1">
@@ -77,7 +80,7 @@ function CartScreen() {
                         <NextLink href={`/product/${item.slug}`} passHref>
                           <Link>
                             <Image
-                              src={item.image}
+                              src={JSON.parse(item.image)[0].imagePath}
                               alt={item.name}
                               width={50}
                               height={50}

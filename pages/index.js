@@ -81,10 +81,11 @@ export async function getServerSideProps() {
     })
     .limit(6);
   await db.disconnect();
+
   return {
     props: {
       advertises: advertiseDocs.map(db.convertDocToObj),
-      topRatedProducts: topRatedProductsDocs.map(db.convertDocToObj),
+      topRatedProducts: topRatedProductsDocs.map(db.convertDocToObj4Product),
     },
   };
 }
