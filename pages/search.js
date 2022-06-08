@@ -1,4 +1,5 @@
 import {
+  CircularProgress,
   Box,
   Button,
   Grid,
@@ -9,6 +10,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
+import { useState, useEffect } from 'react';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { useRouter } from 'next/router';
 import React, { useContext } from 'react';
@@ -70,17 +72,22 @@ export default function Search(props) {
   const {
     query = 'all',
     category = 'all',
-    brand = 'all',
+    //brand = 'all',
+    tag = 'all',
     price = 'all',
     rating = 'all',
     sort = 'featured',
   } = router.query;
-  const { products, countProducts, categories, brands, pages } = props;
+  const { products, countProducts, categories, /*brands,*/ pages } = props;
+  const [tags, setTags] = useState([{ id: '제한없음', tagName: '제한없음' }]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [tagName, setTagName] = useState('제한없음');
 
   const filterSearch = ({
     page,
     category,
-    brand,
+    //brand,
+    tagName,
     sort,
     min,
     max,
@@ -94,7 +101,8 @@ export default function Search(props) {
     if (searchQuery) query.searchQuery = searchQuery;
     if (sort) query.sort = sort;
     if (category) query.category = category;
-    if (brand) query.brand = brand;
+    //if (brand) query.brand = brand;
+    if (tagName) query.tagName = tagName;
     if (price) query.price = price;
     if (rating) query.rating = rating;
     if (min) query.min ? query.min : query.min === 0 ? 0 : min;
@@ -105,15 +113,33 @@ export default function Search(props) {
       query: query,
     });
   };
-  const categoryHandler = (e) => {
-    filterSearch({ category: e.target.value });
+  const categoryHandler = async (e) => {
+    setTagName('all');
+    setIsLoading(true);
+    if (e.target.value == 'all') {
+      setTags([{ id: '제한없음', tagName: '제한없음' }]);
+      setIsLoading(false);
+    } else {
+      const { data } = await axios.get(
+        `/api/categories/get_tags_by_category?name=${e.target.value}`
+      );
+      setTags(data[0].tags);
+      setIsLoading(false);
+    }
+    filterSearch({ category: e.target.value, tagName: 'all' });
   };
   const pageHandler = (e, page) => {
     filterSearch({ page });
   };
+  const tagHandler = (e) => {
+    setTagName(e.target.value);
+    filterSearch({ tagName: e.target.value });
+  };
+  /*
   const brandHandler = (e) => {
     filterSearch({ brand: e.target.value });
   };
+  */
   const sortHandler = (e) => {
     filterSearch({ sort: e.target.value });
   };
@@ -123,6 +149,28 @@ export default function Search(props) {
   const ratingHandler = (e) => {
     filterSearch({ rating: e.target.value });
   };
+
+  const fetchTags = async () => {
+    try {
+      if (category == 'all') {
+        setIsLoading(false);
+        setTags([{ id: '제한없음', tagName: '제한없음' }]);
+      } else {
+        const { data } = await axios.get(
+          `/api/categories/get_tags_by_category?name=${category}`
+        );
+        setTags(data[0].tags);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
 
   const { state, dispatch } = useContext(Store);
   const addToCartHandler = async (product) => {
@@ -155,7 +203,7 @@ export default function Search(props) {
               <Box className={classes.fullWidth}>
                 <Typography>카테고리</Typography>
                 <Select fullWidth value={category} onChange={categoryHandler}>
-                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="all">제한없음</MenuItem>
                   {categories &&
                     categories.map((category) => (
                       <MenuItem key={category} value={category}>
@@ -165,11 +213,30 @@ export default function Search(props) {
                 </Select>
               </Box>
             </ListItem>
-            <ListItem>
+            {isLoading === false ? (
+              <ListItem>
+                <Box className={classes.fullWidth}>
+                  <Typography>하위카테고리</Typography>
+                  <Select value={tagName} onChange={tagHandler} fullWidth>
+                    <MenuItem value="all">제한없음</MenuItem>
+                    {tags &&
+                      tags.map((tag) => (
+                        <MenuItem key={tag._id} value={tag.tagName}>
+                          {tag.tagName}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </Box>
+              </ListItem>
+            ) : (
+              <CircularProgress />
+            )}
+
+            {/* <ListItem>
               <Box className={classes.fullWidth}>
-                <Typography>Brands</Typography>
+                <Typography>상표</Typography>
                 <Select value={brand} onChange={brandHandler} fullWidth>
-                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="all">제한없음</MenuItem>
                   {brands &&
                     brands.map((brand) => (
                       <MenuItem key={brand} value={brand}>
@@ -178,12 +245,12 @@ export default function Search(props) {
                     ))}
                 </Select>
               </Box>
-            </ListItem>
+            </ListItem> */}
             <ListItem>
               <Box className={classes.fullWidth}>
-                <Typography>Prices</Typography>
+                <Typography>가격</Typography>
                 <Select value={price} onChange={priceHandler} fullWidth>
-                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="all">제한없음</MenuItem>
                   {prices.map((price) => (
                     <MenuItem key={price.value} value={price.value}>
                       {price.name}
@@ -194,9 +261,9 @@ export default function Search(props) {
             </ListItem>
             <ListItem>
               <Box className={classes.fullWidth}>
-                <Typography>Ratings</Typography>
+                <Typography>추천수</Typography>
                 <Select value={rating} onChange={ratingHandler} fullWidth>
-                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="all">제한없음</MenuItem>
                   {ratings.map((rating) => (
                     <MenuItem dispaly="flex" key={rating} value={rating}>
                       <Rating value={rating} readOnly />
@@ -211,15 +278,17 @@ export default function Search(props) {
         <Grid item md={9}>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
-              {products.length === 0 ? 'No' : countProducts} Results
+              {products.length === 0 ? 'No' : countProducts} 개의 검색결과
               {query !== 'all' && query !== '' && ' : ' + query}
               {category !== 'all' && ' : ' + category}
-              {brand !== 'all' && ' : ' + brand}
+              {/* {brand !== 'all' && ' : ' + brand} */}
+              {tag !== 'all' && ' : ' + tag}
               {price !== 'all' && ' : Price ' + price}
               {rating !== 'all' && ' : Rating ' + rating + ' & up'}
               {(query !== 'all' && query !== '') ||
               category !== 'all' ||
-              brand !== 'all' ||
+              //brand !== 'all' ||
+              tag !== 'all' ||
               rating !== 'all' ||
               price !== 'all' ? (
                 <Button onClick={() => router.push('/search')}>
@@ -229,14 +298,14 @@ export default function Search(props) {
             </Grid>
             <Grid item>
               <Typography component="span" className={classes.sort}>
-                Sort by
+                정렬기준
               </Typography>
               <Select value={sort} onChange={sortHandler}>
-                <MenuItem value="featured">Featured</MenuItem>
-                <MenuItem value="lowest">Price: Low to High</MenuItem>
-                <MenuItem value="highest">Price: High to Low</MenuItem>
-                <MenuItem value="toprated">Customer Reviews</MenuItem>
-                <MenuItem value="newest">Newest Arrivals</MenuItem>
+                <MenuItem value="featured">추천</MenuItem>
+                <MenuItem value="lowest">낮은가격순</MenuItem>
+                <MenuItem value="highest">높은가격순</MenuItem>
+                <MenuItem value="toprated">리뷰</MenuItem>
+                <MenuItem value="newest">새상품</MenuItem>
               </Select>
             </Grid>
           </Grid>
@@ -267,6 +336,7 @@ export async function getServerSideProps({ query }) {
   const pageSize = query.pageSize || PAGE_SIZE;
   const page = query.page || 1;
   const category = query.category || '';
+  const tagName = query.tagName || '';
   const brand = query.brand || '';
   const price = query.price || '';
   const rating = query.rating || '';
@@ -283,6 +353,7 @@ export async function getServerSideProps({ query }) {
         }
       : {};
   const categoryFilter = category && category !== 'all' ? { category } : {};
+  const tagFilter = tagName && tagName !== 'all' ? { tagName } : {};
   const brandFilter = brand && brand !== 'all' ? { brand } : {};
   const ratingFilter =
     rating && rating !== 'all'
@@ -317,11 +388,13 @@ export async function getServerSideProps({ query }) {
       : { _id: -1 };
 
   const categories = await Product.find().distinct('category');
-  const brands = await Product.find().distinct('brand');
+  //const brands = await Product.find().distinct('brand');
+
   const productDocs = await Product.find(
     {
       ...queryFilter,
       ...categoryFilter,
+      ...tagFilter,
       ...priceFilter,
       ...brandFilter,
       ...ratingFilter,
@@ -336,6 +409,7 @@ export async function getServerSideProps({ query }) {
   const countProducts = await Product.countDocuments({
     ...queryFilter,
     ...categoryFilter,
+    ...tagFilter,
     ...priceFilter,
     ...brandFilter,
     ...ratingFilter,
@@ -343,6 +417,7 @@ export async function getServerSideProps({ query }) {
   await db.disconnect();
 
   const products = productDocs.map(db.convertDocToObj4Product);
+
   return {
     props: {
       products,
@@ -350,7 +425,7 @@ export async function getServerSideProps({ query }) {
       page,
       pages: Math.ceil(countProducts / pageSize),
       categories,
-      brands,
+      //brands,
     },
   };
 }

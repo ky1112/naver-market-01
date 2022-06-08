@@ -101,12 +101,13 @@ function MonitorUser() {
   const { enqueueSnackbar } = useSnackbar();
 
   const deleteHandler = async (userId) => {
-    if (!window.confirm('Are you sure?')) {
-      return;
-    }
+    // if (!window.confirm('Are you sure?')) {
+    //   return;
+    // }
+
     try {
       dispatch_local({ type: 'DELETE_REQUEST' });
-      await axios.delete(`/api/admin/users/${userId}`, {
+      await axios.delete(`/api/admin/monitor/${userId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
       dispatch_local({ type: 'DELETE_SUCCESS' });

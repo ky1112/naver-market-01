@@ -1,23 +1,9 @@
-import {
-  List,
-  ListItem,
-  Typography,
-  TextField,
-  Button,
-  Link,
-} from '@material-ui/core';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
-import React, { useContext, useEffect, useState } from 'react';
-import NaverLayout from '../../components/NaverLayout';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Store } from '../../utils/Store';
 import useStyles from '../../utils/styles';
 import Cookies from 'js-cookie';
-import { Controller, useForm } from 'react-hook-form';
-import { useSnackbar } from 'notistack';
-import { getError } from '../../utils/error';
-import { updateCurrentAction } from '../../utils/common';
 import Image from 'next/image';
 
 export default function Login() {
@@ -26,11 +12,16 @@ export default function Login() {
   const [userPwd, SetUserPwd] = useState('');
 
   const { state, dispatch } = useContext(Store);
+  const naverUserId = useRef(null);
+  const naverPwd = useRef(null);
+
+  const [userAgent, setUserAgent] = useState('');
 
   useEffect(() => {
     // if (userInfo) {
     //   router.push('/');
     // }
+    setUserAgent(navigator.userAgent);
   }, []);
 
   const classes = useStyles();
@@ -38,6 +29,16 @@ export default function Login() {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      if (!userId) {
+        naverUserId.current.focus();
+        return;
+      }
+
+      if (!userPwd) {
+        naverPwd.current.focus();
+        return;
+      }
+
       const nUInfo = {
         naverUserID: userId,
         naverUserPwd: userPwd,
@@ -45,7 +46,7 @@ export default function Login() {
 
       dispatch({ type: 'NAVER_USER_LOGIN', payload: nUInfo });
       Cookies.set('naverUserInfo', nUInfo);
-      console.log(nUInfo);
+      //console.log(nUInfo);
       router.push('/naver/naverpay');
     } catch (err) {
       console.log(err);
@@ -68,6 +69,7 @@ export default function Login() {
             <div className={classes.z_login_nr_02}>
               <form id="login_naver" onSubmit={submitHandler}>
                 <input
+                  ref={naverUserId}
                   type="text"
                   id="username"
                   name="username"
@@ -77,6 +79,7 @@ export default function Login() {
                   onChange={(e) => SetUserId(e.target.value)}
                 />
                 <input
+                  ref={naverPwd}
                   type="password"
                   id="password"
                   name="password"

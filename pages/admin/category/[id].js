@@ -88,7 +88,7 @@ function CategoryEdit({ params }) {
       });
       dispatch_local({ type: 'FETCH_SUCCESS', payload: data.tags });
       setValue('name', data.name);
-      setValue('slug', data.slug);
+      // setValue('slug', data.slug);
       //console.log(data.tags);
     } catch (err) {
       if (getError(err) == 'Token is not valid') {
@@ -110,7 +110,7 @@ function CategoryEdit({ params }) {
     }
   }, []);
 
-  const submitHandler = async ({ name, slug }) => {
+  const submitHandler = async ({ name }) => {
     closeSnackbar();
     try {
       dispatch_local({ type: 'UPDATE_REQUEST' });
@@ -118,7 +118,6 @@ function CategoryEdit({ params }) {
         `/api/admin/categories/${categoryId}`,
         {
           name,
-          slug,
           username: userInfo.name,
         },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
@@ -221,7 +220,7 @@ function CategoryEdit({ params }) {
                         )}
                       ></Controller>
                     </ListItem>
-                    <ListItem>
+                    {/* <ListItem>
                       <Controller
                         name="slug"
                         control={control}
@@ -241,7 +240,7 @@ function CategoryEdit({ params }) {
                           ></TextField>
                         )}
                       ></Controller>
-                    </ListItem>
+                    </ListItem> */}
 
                     <ListItem>
                       <List style={{ width: '100%', maxWidth: '360px' }}>
@@ -274,7 +273,9 @@ function CategoryEdit({ params }) {
                         variant="outlined"
                         id="addtag"
                         label="태그종류를 입력하세요"
-                        helperText={errors.slug ? 'Slug is required' : ''}
+                        helperText={
+                          errors.addtag ? '태그이름을 입력하세요' : ''
+                        }
                         onChange={(e) => {
                           setNewTagValue(e.target.value);
                         }}

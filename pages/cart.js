@@ -54,9 +54,9 @@ function CartScreen() {
       </Typography>
       {cartItems.length === 0 ? (
         <div>
-          Cart is empty.{' '}
+          카트가 비였습니다..{' '}
           <NextLink href="/" passHref>
-            <Link>Go shopping</Link>
+            <Link>쇼핑홈으로 가기</Link>
           </NextLink>
         </div>
       ) : (
@@ -110,7 +110,7 @@ function CartScreen() {
                           ))}
                         </Select>
                       </TableCell>
-                      <TableCell align="right">${item.price}</TableCell>
+                      <TableCell align="right">{item.price}원</TableCell>
                       <TableCell align="right">
                         <Button
                           variant="contained"

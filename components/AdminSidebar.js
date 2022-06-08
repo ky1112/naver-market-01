@@ -6,7 +6,7 @@ import useStyles from '../utils/styles';
 export default function AdminSideBar({ activeSelect }) {
   const classes = useStyles();
   return (
-    <Grid item md={1} xs={12}>
+    <Grid item md={2} xs={12}>
       <Card className={classes.section}>
         <List>
           <NextLink href="/admin/dashboard" passHref>

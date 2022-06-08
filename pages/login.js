@@ -30,6 +30,8 @@ export default function Login() {
   const { redirect } = router.query; // login?redirect=/shipping
   const { state, dispatch } = useContext(Store);
   const { userInfo } = state;
+  // const { userAgent } = props;
+  // console.log(userAgent);
   useEffect(() => {
     if (userInfo) {
       router.push('/');
@@ -56,7 +58,7 @@ export default function Login() {
         isConnected: true,
       });
 
-      router.push(redirect || '/');
+      router.push(redirect || '/admin/dashboard');
     } catch (err) {
       enqueueSnackbar(getError(err), { variant: 'error' });
     }

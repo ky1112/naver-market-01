@@ -18,8 +18,10 @@ handler.get(async (req, res) => {
   // await Advertise.deleteMany();
   // await Advertise.insertMany(data.advertise);
 
+  //await Category.deleteMany();
+  // await Advertise.deleteMany();
   await Product.deleteMany();
-  await Product.insertMany(data.products);
+  // await Product.insertMany(data.products);
   await db.disconnect();
 
   return res.send({ message: 'already seeded' });

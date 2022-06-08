@@ -232,10 +232,10 @@ export default function Layout({ title, description, children, isAdminPage }) {
               </form>
             </div>
             <div>
-              <Switch
+              {/* <Switch
                 checked={darkMode}
                 onChange={darkModeChangeHandler}
-              ></Switch>
+              ></Switch> */}
               <NextLink href="/cart" passHref>
                 <Link>
                   <Typography component="span">
@@ -296,7 +296,7 @@ export default function Layout({ title, description, children, isAdminPage }) {
               ) : (
                 <NextLink href="/login" passHref>
                   <Link>
-                    <Typography component="span">로그인</Typography>
+                    <Typography component="span">관리자 로그인</Typography>
                   </Link>
                 </NextLink>
               )}

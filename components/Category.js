@@ -3,6 +3,8 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import CategoryBody from './CategoryBody';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const StyledMenu = withStyles({
   paper: {
@@ -25,6 +27,7 @@ const StyledMenu = withStyles({
 ));
 
 export default function Category() {
+  const router = useRouter();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event) => {
@@ -35,8 +38,23 @@ export default function Category() {
     setAnchorEl(null);
   };
 
-  const handleClickCategorySearch = (e) => {
+  const handleClickCategorySearch = async (
+    searchType,
+    searchId,
+    searchName
+  ) => {
+    console.log(searchId, searchType);
     setAnchorEl(null);
+    if (searchType == 'tag') {
+      const { data } = await axios.get(
+        `/api/categories/get_category_by_tagid?id=${searchId}`
+      );
+      //console.log(data[0]);
+      router.push(`/search?category=${data[0].name}&tagName=${searchName}`);
+    } else {
+      router.push(`/search?category=${searchName}`);
+    }
+    //router.push(`/search?category=${category}&tagName=${tagName}`);
   };
 
   return (

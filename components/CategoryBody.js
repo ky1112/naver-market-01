@@ -143,10 +143,8 @@ export default function CategoryBody(props) {
     }
   };
 
-  const handleClickItem = (searchType, searchId) => {
-    console.log(searchType);
-    console.log(searchId);
-    handleClickCategorySearch(searchType);
+  const handleClickItem = (searchType, searchId, searchName) => {
+    handleClickCategorySearch(searchType, searchId, searchName);
   };
 
   useEffect(() => {
@@ -179,7 +177,7 @@ export default function CategoryBody(props) {
                   labelInfo=""
                   color="#1a73e8"
                   bgColor="#e8f0fe"
-                  onClick={() => handleClickItem('tag', tag._id)}
+                  onClick={() => handleClickItem('tag', tag._id, tag.tagName)}
                 />
               ))}
             </StyledTreeItem>
@@ -189,7 +187,9 @@ export default function CategoryBody(props) {
               nodeId={category._id}
               labelText={category.name}
               labelIcon={MailIcon}
-              onClick={() => handleClickItem('category', category._id)}
+              onClick={() =>
+                handleClickItem('category', category._id, category.name)
+              }
             />
           )}
         </>

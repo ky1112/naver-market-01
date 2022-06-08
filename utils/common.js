@@ -10,6 +10,15 @@ async function updateCurrentAction(data) {
   });
 }
 
+async function updateUserAction(data) {
+  await axios.post('/api/common/updateAction', {
+    userid: data.userid,
+    token: data.token,
+    accessUrl: data.accessUrl,
+    loginstatus: data.isConnected,
+  });
+}
+
 function clearCookies() {
   Cookies.remove('userInfo');
   Cookies.remove('cartItems');

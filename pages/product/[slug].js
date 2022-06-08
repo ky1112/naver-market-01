@@ -153,7 +153,7 @@ export default function ProductScreen(props) {
                     <Typography>가격</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography>${product.price}</Typography>
+                    <Typography>{product.price}원</Typography>
                   </Grid>
                 </Grid>
               </ListItem>

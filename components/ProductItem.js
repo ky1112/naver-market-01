@@ -14,8 +14,8 @@ import Rating from '@material-ui/lab/Rating';
 export default function ProductItem({ product, addToCartHandler }) {
   useEffect(() => {
     //console.log(1);
-    var a = JSON.parse(product.image);
-    console.log(a[0].imagePath);
+    // var a = JSON.parse(product.image);
+    // console.log(a[0].imagePath);
   });
 
   return (
@@ -26,6 +26,8 @@ export default function ProductItem({ product, addToCartHandler }) {
             component="img"
             image={JSON.parse(product.image)[0].imagePath}
             title={product.name}
+            width={'400px'}
+            height={'500px'}
           ></CardMedia>
           <CardContent>
             <Typography>{product.name}</Typography>
@@ -34,13 +36,13 @@ export default function ProductItem({ product, addToCartHandler }) {
         </CardActionArea>
       </NextLink>
       <CardActions>
-        <Typography>${product.price}</Typography>
+        <Typography>{product.price}원</Typography>
         <Button
           size="small"
           color="primary"
           onClick={() => addToCartHandler(product)}
         >
-          Add to cart
+          카트에 추가
         </Button>
       </CardActions>
     </Card>

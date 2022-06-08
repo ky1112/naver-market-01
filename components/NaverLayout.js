@@ -51,6 +51,7 @@ export default function NaverLayout({
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const { darkMode, cart, userInfo } = state;
+
   const theme = createTheme({
     typography: {
       h1: {

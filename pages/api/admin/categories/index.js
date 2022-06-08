@@ -14,23 +14,31 @@ handler.get(async (req, res) => {
 });
 
 handler.post(async (req, res) => {
-  await db.connect();
-  const newCategory = new Category({
-    name: 'sample category',
-    slug: 'sample-slug-' + Math.random(),
-    tags: [
-      {
-        tagName: 'tag1',
-      },
-      {
-        tagName: 'tag2',
-      },
-    ],
-  });
+  try {
+    await db.connect();
+    console.log(1);
 
-  const category = await newCategory.save();
-  await db.disconnect();
-  res.send({ message: 'Category Created', category });
+    const newCategory = new Category({
+      name: '새 카테고리',
+      //slug: 'sample-slug-' + Math.random(),
+      // tags: [
+      //   {
+      //     tagName: 'tag1',
+      //   },
+      //   {
+      //     tagName: 'tag2',
+      //   },
+      // ],
+    });
+
+    const category = await newCategory.save();
+    console.log(2);
+    await db.disconnect();
+    res.send({ message: 'Category Created', category });
+  } catch (err) {
+    console.log(err);
+    res.status(401).send({ message: '오류발생' });
+  }
 });
 
 export default handler;
