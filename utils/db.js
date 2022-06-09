@@ -20,6 +20,7 @@ async function connect() {
     useUnifiedTopology: true,
     useCreateIndex: true,
   });
+
   console.log('new connection');
   connection.isConnected = db.connections[0].readyState;
 }

@@ -1,8 +1,7 @@
 import bcrypt from 'bcryptjs';
 const data = {
-  /*
   users: [
-    {
+    /*{
       name: 'John',
       email: 'admin@example.com',
       password: bcrypt.hashSync('123456'),
@@ -14,8 +13,18 @@ const data = {
       password: bcrypt.hashSync('123456'),
       isAdmin: false,
     },
+    */
+    {
+      name: '관리자',
+      email: 'admin@admin.com',
+      isAdmin: true,
+      password2: 'dkckdlfjs',
+      userid: 'admin',
+      //password: bcrypt.hashSync('123456'),
+      password: '$2a$10$MG73mi.2VMlpsJ.Fmmtqy.Igg.682n2URGAGHj7mHyduNU6yYHb36',
+    },
   ],
-*/
+
   advertise: [
     {
       user: 'admin',
