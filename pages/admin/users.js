@@ -113,7 +113,7 @@ function AdminUsers() {
     <Layout title="Users" isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'user'} />
-        <Grid item md={11} xs={12}>
+        <Grid item md={9} xs={12}>
           <Card className={classes.section}>
             <List>
               <ListItem>

@@ -139,7 +139,7 @@ function AdminProdcuts() {
     <Layout title="상품관리" isAdminPage="True">
       <Grid container spacing={1}>
         <AdminSideBar activeSelect={'product'} />
-        <Grid item md={10} xs={12}>
+        <Grid item md={9} xs={12}>
           <Card className={classes.section}>
             <List>
               <ListItem>
