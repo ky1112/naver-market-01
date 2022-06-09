@@ -18,15 +18,15 @@ import {
   MenuItem,
   Box,
   IconButton,
-  Drawer,
-  List,
-  ListItem,
-  Divider,
-  ListItemText,
+  // Drawer,
+  // List,
+  // ListItem,
+  // Divider,
+  // ListItemText,
   InputBase,
 } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import CancelIcon from '@material-ui/icons/Cancel';
+//import MenuIcon from '@material-ui/icons/Menu';
+//import CancelIcon from '@material-ui/icons/Cancel';
 import SearchIcon from '@material-ui/icons/Search';
 import useStyles from '../utils/styles';
 import { Store } from '../utils/Store';
@@ -72,22 +72,22 @@ export default function Layout({ title, description, children, isAdminPage }) {
 
   const classes = useStyles();
 
-  const [sidbarVisible, setSidebarVisible] = useState(false);
-  const sidebarOpenHandler = () => {
-    setSidebarVisible(true);
-  };
+  // const [sidbarVisible, setSidebarVisible] = useState(false);
+  // const sidebarOpenHandler = () => {
+  //   setSidebarVisible(true);
+  // };
 
-  const sidebarCloseHandler = () => {
-    setSidebarVisible(false);
-  };
+  // const sidebarCloseHandler = () => {
+  //   setSidebarVisible(false);
+  // };
 
-  const [categories, setCategories] = useState([]);
+  //const [categories, setCategories] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get(`/api/categories/categories`);
-      setCategories(data);
+      await axios.get(`/api/categories/categories`);
+      //setCategories(data);
     } catch (err) {
       enqueueSnackbar(getError(err), { variant: 'error' });
     }
