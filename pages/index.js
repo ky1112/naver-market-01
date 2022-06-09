@@ -42,6 +42,8 @@ export default function Home(props) {
                 src={advertise.imagePath}
                 alt={advertise.advertiseName}
                 className={classes.featuredImage}
+                width={'100%'}
+                height={'250px'}
               ></img>
             </Link>
           </NextLink>
