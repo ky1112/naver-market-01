@@ -1,33 +1,15 @@
-import {
-  CircularProgress,
-  List,
-  ListItem,
-  Typography,
-  TextField,
-  Button,
-  Link,
-} from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
-import NaverLayout from '../../components/NaverLayout';
 import { Store } from '../../utils/Store';
 import useStyles from '../../utils/styles';
 import Cookies from 'js-cookie';
-import { Controller, useForm } from 'react-hook-form';
-import { useSnackbar } from 'notistack';
-import { getError } from '../../utils/error';
-import { updateCurrentAction } from '../../utils/common';
 import Image from 'next/image';
-import timespan from 'jsonwebtoken/lib/timespan';
 
 export default function NaverPayDone() {
   const router = useRouter();
-
-  const { redirect } = router.query; // login?redirect=/shipping
   const { state, dispatch } = useContext(Store);
-  const { userInfo } = state;
   const {
     cart: { cartItems },
   } = state;

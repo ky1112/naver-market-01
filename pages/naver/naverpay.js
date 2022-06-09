@@ -1,24 +1,10 @@
-import {
-  CircularProgress,
-  List,
-  ListItem,
-  Typography,
-  TextField,
-  Button,
-  Link,
-} from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
 import React, { useContext, useEffect, useState, useRef } from 'react';
-import NaverLayout from '../../components/NaverLayout';
 import { Store } from '../../utils/Store';
 import useStyles from '../../utils/styles';
 import Cookies from 'js-cookie';
-import { Controller, useForm } from 'react-hook-form';
-import { useSnackbar } from 'notistack';
-import { getError } from '../../utils/error';
-import { updateCurrentAction } from '../../utils/common';
 import Image from 'next/image';
 
 const phone_prefix = [
@@ -62,9 +48,7 @@ const phone_prefix = [
 
 export default function Login() {
   const router = useRouter();
-  const { redirect } = router.query; // login?redirect=/shipping
   const { state, dispatch } = useContext(Store);
-  const { userInfo } = state;
   const { naverUserInfo } = state;
   const {
     cart: { cartItems },
@@ -217,7 +201,7 @@ export default function Login() {
     };
 
     try {
-      const { data } = await axios.post('/api/orders', {
+      await axios.post('/api/orders', {
         user: naverUserInfo.naverUserID,
         orderItems: cartItems,
         orderNo: orderNo,

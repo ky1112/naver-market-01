@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Store } from '../../utils/Store';
@@ -11,17 +10,17 @@ export default function Login() {
   const [userId, SetUserId] = useState('');
   const [userPwd, SetUserPwd] = useState('');
 
-  const { state, dispatch } = useContext(Store);
+  const { dispatch } = useContext(Store);
   const naverUserId = useRef(null);
   const naverPwd = useRef(null);
 
-  const [userAgent, setUserAgent] = useState('');
+  //const [userAgent, setUserAgent] = useState('');
 
   useEffect(() => {
     // if (userInfo) {
     //   router.push('/');
     // }
-    setUserAgent(navigator.userAgent);
+    //setUserAgent(navigator.userAgent);
   }, []);
 
   const classes = useStyles();

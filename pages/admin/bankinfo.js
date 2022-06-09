@@ -1,7 +1,7 @@
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect, useContext, useReducer, useState } from 'react';
+import React, { useEffect, useContext, useReducer } from 'react';
 
 import {
   Grid,
@@ -12,9 +12,9 @@ import {
   Button,
   TextField,
   CircularProgress,
-  FormControlLabel,
-  Checkbox,
-  MenuItem,
+  //FormControlLabel,
+  //Checkbox,
+  //MenuItem,
 } from '@material-ui/core';
 
 import { getError } from '../../utils/error';
@@ -60,10 +60,10 @@ function reducer(state, action) {
   }
 }
 
-function BankInfo({ params }) {
+function BankInfo() {
   //const advertiseId = params.id;
   const { state, dispatch } = useContext(Store);
-  const [{ loading, error, loadingUpdate, loadingUpload }, dispatch_local] =
+  const [{ loading, error, loadingUpdate /*loadingUpload*/ }, dispatch_local] =
     useReducer(reducer, {
       loading: true,
       error: '',
@@ -80,7 +80,7 @@ function BankInfo({ params }) {
   const router = useRouter();
   const classes = useStyles();
   const { userInfo } = state;
-  const [advertiseStatus, SetAdvertiseStatus] = useState(false);
+  //const [advertiseStatus, SetAdvertiseStatus] = useState(false);
 
   const fetchData = async () => {
     try {

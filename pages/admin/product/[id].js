@@ -233,7 +233,7 @@ function ProductEdit({ params }) {
     price,
     category,
     subcategory,
-    image,
+    //image,
     featuredImage,
     brand,
     countInStock,

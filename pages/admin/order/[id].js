@@ -1,7 +1,7 @@
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect, useContext, useReducer, useState } from 'react';
+import React, { useEffect, useContext, useReducer } from 'react';
 import NextLink from 'next/link';
 import {
   Grid,
@@ -21,18 +21,18 @@ import {
 } from '@material-ui/core';
 import Image from 'next/image';
 
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
-import ImageIcon from '@material-ui/icons/Image';
+//import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+//import Avatar from '@material-ui/core/Avatar';
+//import ImageIcon from '@material-ui/icons/Image';
 
 import { getError } from '../../../utils/error';
 import { Store } from '../../../utils/Store';
 import Layout from '../../../components/Layout';
 import AdminSideBar from '../../../components/AdminSidebar';
 import useStyles from '../../../utils/styles';
-import { Controller, useForm } from 'react-hook-form';
-import { useSnackbar } from 'notistack';
-import { clearCookies } from '../../../utils/common';
+//import { Controller, useForm } from 'react-hook-form';
+//import { useSnackbar } from 'notistack';
+//import { clearCookies } from '../../../utils/common';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -98,7 +98,7 @@ function OrderDetail({ params }) {
     deliveredAt,
   } = order;
 
-  const { enqueueSnackbar } = useSnackbar();
+  //const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (!userInfo) {

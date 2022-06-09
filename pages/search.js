@@ -5,7 +5,7 @@ import {
   Grid,
   List,
   ListItem,
-  Menu,
+  //Menu,
   MenuItem,
   Select,
   Typography,
@@ -24,8 +24,8 @@ import axios from 'axios';
 import Rating from '@material-ui/lab/Rating';
 import { Pagination } from '@material-ui/lab';
 
-import { withStyles } from '@material-ui/core/styles';
-import CategoryBody from '../components/CategoryBody';
+// import { withStyles } from '@material-ui/core/styles';
+//import CategoryBody from '../components/CategoryBody';
 
 const PAGE_SIZE = 3;
 
@@ -46,6 +46,7 @@ const prices = [
 
 const ratings = [1, 2, 3, 4, 5];
 
+/*
 const StyledMenu = withStyles({
   paper: {
     border: '1px solid #d3d4d5',
@@ -65,6 +66,7 @@ const StyledMenu = withStyles({
     {...props}
   />
 ));
+*/
 
 export default function Search(props) {
   const classes = useStyles();
