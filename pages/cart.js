@@ -132,7 +132,7 @@ function CartScreen() {
                 <ListItem>
                   <Typography variant="h2">
                     총계 ({cartItems.reduce((a, c) => a + c.quantity, 0)} 개) :
-                    ${cartItems.reduce((a, c) => a + c.quantity * c.price, 0)}
+                    {cartItems.reduce((a, c) => a + c.quantity * c.price, 0)}원
                   </Typography>
                 </ListItem>
                 <ListItem>

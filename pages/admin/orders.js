@@ -117,7 +117,7 @@ function AdminOrders() {
                               {order.user}
                             </TableCell>
                             <TableCell>{order.createdAt}</TableCell>
-                            <TableCell>${order.totalPrice}</TableCell>
+                            <TableCell>{order.totalPrice}원</TableCell>
                             <TableCell>
                               {order.isPaid
                                 ? `paid at ${order.paidAt}`

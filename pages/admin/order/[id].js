@@ -229,7 +229,10 @@ function OrderDetail({ params }) {
                                           >
                                             <Link>
                                               <Image
-                                                src={item.image}
+                                                src={
+                                                  JSON.parse(item.image)[0]
+                                                    .imagePath
+                                                }
                                                 alt={item.name}
                                                 width={50}
                                                 height={50}
