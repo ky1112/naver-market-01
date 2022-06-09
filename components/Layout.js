@@ -160,14 +160,15 @@ export default function Layout({ title, description, children, isAdminPage }) {
         <AppBar position="static" className={classes.navbar}>
           <Toolbar className={classes.toolbar}>
             <Box display="flex" alignItems="center">
-              <IconButton
+              {/* <IconButton
                 edge="start"
                 aria-label="open drawer"
                 onClick={sidebarOpenHandler}
                 className={classes.menuButton}
               >
                 <MenuIcon className={classes.navbarButton} />
-              </IconButton>
+              </IconButton> */}
+
               <NextLink href="/" passHref>
                 <Link>
                   <Typography className={classes.brand}>
@@ -176,7 +177,7 @@ export default function Layout({ title, description, children, isAdminPage }) {
                 </Link>
               </NextLink>
             </Box>
-            <Drawer
+            {/* <Drawer
               anchor="left"
               open={sidbarVisible}
               onClose={sidebarCloseHandler}
@@ -214,7 +215,7 @@ export default function Layout({ title, description, children, isAdminPage }) {
                   </NextLink>
                 ))}
               </List>
-            </Drawer>
+            </Drawer> */}
 
             <div className={classes.searchSection}>
               <form onSubmit={submitHandler} className={classes.searchForm}>
