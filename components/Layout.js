@@ -81,7 +81,7 @@ export default function Layout({ title, description, children, isAdminPage }) {
   //   setSidebarVisible(false);
   // };
 
-  //const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
   const fetchCategories = async () => {
@@ -123,6 +123,7 @@ export default function Layout({ title, description, children, isAdminPage }) {
   };
 
   const loginMenuCloseHandler = (e, redirect) => {
+    // test app
     setAnchorEl(null);
     if (redirect && redirect != 'backdropClick') {
       router.push(redirect);
